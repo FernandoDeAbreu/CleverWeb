@@ -1,0 +1,25 @@
+﻿@model CleverWeb.Features.Users.ViewModels.RegisterUserViewModel
+
+<h2>Cadastrar Usuário</h2>
+
+<form asp-action="Register" method="post">
+    <div>
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" />
+        <span asp-validation-for="UserName"></span>
+    </div>
+
+    <div>
+        <label asp-for="Senha"></label>
+        <input asp-for="Senha" />
+        <span asp-validation-for="Senha"></span>
+    </div>
+
+    <div>
+        <label asp-for="ConfirmarSenha"></label>
+        <input asp-for="ConfirmarSenha" />
+        <span asp-validation-for="ConfirmarSenha"></span>
+    </div>
+
+    <button type="submit">Cadastrar</button>
+</form>

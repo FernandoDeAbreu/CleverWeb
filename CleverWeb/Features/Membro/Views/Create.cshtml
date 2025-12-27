@@ -1,0 +1,42 @@
+﻿@model MembroViewModel
+
+@{
+    ViewData["Title"] = "Novo Membro";
+}
+
+<h2>Novo Membro</h2>
+
+<form asp-action="Create" asp-controller="Membro" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Nome" class="form-label"></label>
+        <input asp-for="Nome" class="form-control" placeholder="Digite o nome completo" />
+        <span asp-validation-for="Nome" class="text-danger"></span>
+    </div>
+
+
+    <div class="mb-3">
+        <label asp-for="DataNascimento" class="form-label"></label>
+        <input asp-for="DataNascimento" class="form-control" type="date" />
+        <span asp-validation-for="DataNascimento" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Telefone" class="form-label"></label>
+        <input asp-for="Telefone" class="form-control" placeholder="(99) 99999-9999" />
+        <span asp-validation-for="Telefone" class="text-danger"></span>
+    </div>
+
+    <div class="container-fluid d-flex justify-content-between align-items-center align-baseline">
+        <a asp-action="Index" asp-controller="Membro" class="btn btn-secondary me-2">Voltar</a>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </div>
+   
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

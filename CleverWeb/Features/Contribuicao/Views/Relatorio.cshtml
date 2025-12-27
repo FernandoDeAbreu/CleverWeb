@@ -1,0 +1,71 @@
+﻿@using CleverWeb.Features.Contribuicao.ViewModels
+@using System.Globalization
+@using static CleverWeb.Data.Shared.Enums
+@model IEnumerable<ContribuicaoViewModel>
+
+@{
+    ViewData["Title"] = "Contribuições";
+}
+
+<h2>Gerar relatório</h2>
+
+<div class="mb-0">
+    <form method="get" class="mb-4">
+        <div class="row g-2">
+            <div class="col-md-3">
+                <input type="text" name="NomeMembro" class="form-control" placeholder="Nome do membro" />
+            </div>
+            <div class="col-md-2">
+                <select name="TipoContribuicao" class="form-select">
+                    <option value="">Tipo</option>
+                    @foreach (TipoContribuicao tipo in Enum.GetValues(typeof(TipoContribuicao)))
+                    {
+                        <option value="@tipo">@tipo</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="FormaPagto" class="form-select">
+                    <option value="">Pagamento</option>
+                    @foreach (FormaPagto forma in Enum.GetValues(typeof(FormaPagto)))
+                    {
+                        <option value="@forma">@forma</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="DataInicio" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="DataFim" class="form-control" value="@DateTime.Today" />
+            </div>
+            
+        </div>
+        <div class="row g-2">
+          
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            
+            <a asp-action="ExportarPdf" asp-controller="Contribuicao" class="btn btn-danger mb-3">
+                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+            </a>
+        
+        </div>
+    </form>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-12 mb-0">
+                <div class="card border-0 mb-1">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="card-subtitle mb-1">@item.Membro.Nome</h6>
+                                <p class="card-text">@item.TipoContribuicao - @item.FormaPagto - @item.DataPagamento.ToString("dd/MM/yy")</p>
+                            </div>
+                            <h6 class="card-subtitle mb-1 text-success ms-auto"> @item.Valor.ToString("C", new CultureInfo("pt-BR"))</h6>
+                        </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
