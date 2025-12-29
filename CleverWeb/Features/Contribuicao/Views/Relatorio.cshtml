@@ -45,7 +45,7 @@
           
             <button type="submit" class="btn btn-primary w-100">Filtrar</button>
             
-            <a asp-action="ExportarPdf" asp-controller="Contribuicao" class="btn btn-danger mb-3">
+            <a asp-action="ExportarPdf" asp-controller="Contribuicao" asp-route-id="@Model" class="btn btn-danger mb-3">
                 <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
             </a>
         
