@@ -37,8 +37,6 @@ namespace CleverWeb.Features.Contribuicao
             return View(vm);
         }
 
-      
-
         public async Task<IActionResult> MembroList()
         {
             var Membro = await _db.Membro
@@ -110,13 +108,15 @@ namespace CleverWeb.Features.Contribuicao
             if (id != model.Id)
                 return BadRequest();
 
+            if (!ModelState.IsValid)
+                return View(model);
+
             var entidade = await _db.Contribuicao.FindAsync(id);
             if (entidade == null)
                 return NotFound();
 
             _mapper.Map(model, entidade);
 
-            _db.Contribuicao.Update(entidade);
             await _db.SaveChangesAsync();
 
             TempData["Success"] = "Contribuicao atualizado com sucesso!";
