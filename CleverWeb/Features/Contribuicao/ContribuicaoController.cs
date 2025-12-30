@@ -3,6 +3,7 @@ using CleverWeb.Data;
 using CleverWeb.Features.Contribuicao.Services;
 using CleverWeb.Features.Contribuicao.ViewModels;
 using CleverWeb.Features.Membro.ViewModels;
+using CleverWeb.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,7 @@ namespace CleverWeb.Features.Contribuicao
    
         public async Task<IActionResult> Index()
         {
-            var Contribuicao = await _db.Contribuicao
+            var Contribuicao = await _db.Contribuicao.Where(c => c.MotivoExclusao == null)
                  .Include(c => c.Membro)
                 .AsNoTracking()
                 .OrderByDescending(m => m.DataLancamanto).Take(20)
@@ -89,14 +90,15 @@ namespace CleverWeb.Features.Contribuicao
             return View(vm);
         }
 
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var contribuicao = _db.Contribuicao.Include(c => c.Membro).FirstOrDefault(m => m.Id == id);
+            var contribuicao = await _db.Contribuicao.FindAsync(id); 
 
             if (contribuicao == null)
                 return NotFound();
 
-            ViewBag.Membro = contribuicao.Membro.Nome;
+            ViewBag.MembroId = contribuicao.MembroId;
+
             var vm = _mapper.Map<ContribuicaoViewModel>(contribuicao);
             return View(vm);
         }
@@ -112,8 +114,11 @@ namespace CleverWeb.Features.Contribuicao
                 return View(model);
 
             var entidade = await _db.Contribuicao.FindAsync(id);
+           
             if (entidade == null)
                 return NotFound();
+
+            model.DataExclusao = DateTime.Now;
 
             _mapper.Map(model, entidade);
 

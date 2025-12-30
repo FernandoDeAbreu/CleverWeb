@@ -20,7 +20,7 @@ namespace CleverWeb.Features.Contribuicao.Services
 
         public RelatorioContribuicaoViewModel ObterRelatorio(FiltroContribuicaoViewModel filtro)
         {
-                 var query = _db.Contribuicao
+                 var query = _db.Contribuicao.Where(c => c.MotivoExclusao == null)
                .Include(c => c.Membro)
                .AsNoTracking()
                .OrderByDescending(c => c.DataPagamento)
@@ -46,7 +46,7 @@ namespace CleverWeb.Features.Contribuicao.Services
 
         public async Task<byte[]> ImprimirComprovante(int id)
         {
-            var contribuicao = await _db.Contribuicao
+            var contribuicao = await _db.Contribuicao.Where(c => c.MotivoExclusao == null)
                 .Include(c => c.Membro)
                 .FirstAsync(c => c.Id == id);
 
