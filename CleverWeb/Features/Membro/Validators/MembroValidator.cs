@@ -9,7 +9,7 @@ namespace CleverWeb.Features.Membro.Validators
         {
             RuleFor(x => x.Nome)
                 .NotEmpty().WithMessage("Nome é obrigatório")
-                .MaximumLength(200);
+                .MaximumLength(25);
             RuleFor(x => x.DataNascimento)
                 .LessThan(DateTime.Today).WithMessage("Data de nascimento inválida");
             RuleFor(x => x.Telefone)
