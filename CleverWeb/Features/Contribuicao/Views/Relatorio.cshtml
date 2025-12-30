@@ -1,71 +1,85 @@
 ﻿@using CleverWeb.Features.Contribuicao.ViewModels
 @using System.Globalization
 @using static CleverWeb.Data.Shared.Enums
-@model IEnumerable<ContribuicaoViewModel>
+@model RelatorioContribuicaoViewModel
 
 @{
     ViewData["Title"] = "Contribuições";
+    var filtro = ViewBag.Filtro as FiltroContribuicaoViewModel;
 }
 
-<h2>Gerar relatório</h2>
+<h2 class="mb-3">
+    <i class="bi bi-clipboard-data"></i> Relatório de Contribuições
+</h2>
+
 
 <div class="mb-0">
     <form method="get" class="mb-4">
-        <div class="row g-2">
+        <div class="row g-2 mb-2">
+            <div class="col-md-2">
+                <select asp-for="Filtro.TipoContribuicao"
+                        asp-items="Html.GetEnumSelectList<TipoContribuicao>()"
+                        class="form-select">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+
             <div class="col-md-3">
-                <input type="text" name="NomeMembro" class="form-control" placeholder="Nome do membro" />
+                <input asp-for="Filtro.DataInicio" type="date" class="form-control" />
             </div>
-            <div class="col-md-2">
-                <select name="TipoContribuicao" class="form-select">
-                    <option value="">Tipo</option>
-                    @foreach (TipoContribuicao tipo in Enum.GetValues(typeof(TipoContribuicao)))
-                    {
-                        <option value="@tipo">@tipo</option>
-                    }
-                </select>
+
+            <div class="col-md-3">
+                <input asp-for="Filtro.DataFim" type="date" class="form-control" />
             </div>
-            <div class="col-md-2">
-                <select name="FormaPagto" class="form-select">
-                    <option value="">Pagamento</option>
-                    @foreach (FormaPagto forma in Enum.GetValues(typeof(FormaPagto)))
-                    {
-                        <option value="@forma">@forma</option>
-                    }
-                </select>
+
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
             </div>
-            <div class="col-md-2">
-                <input type="date" name="DataInicio" class="form-control" />
+
+            <div class="col-md-2 d-grid">
+                <button formaction="@Url.Action("ExportarPdf")"
+                        formmethod="get"
+                        class="btn btn-danger">
+                    <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+                </button>
             </div>
-            <div class="col-md-2">
-                <input type="date" name="DataFim" class="form-control" value="@DateTime.Today" />
-            </div>
-            
-        </div>
-        <div class="row g-2">
-          
-            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
-            
-            <a asp-action="ExportarPdf" asp-controller="Contribuicao" class="btn btn-danger mb-3">
-                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-            </a>
-        
         </div>
     </form>
-    <div class="row">
-        @foreach (var item in Model)
-        {
-            <div class="col-md-12 mb-0">
-                <div class="card border-0 mb-1">
-                        <div class="card-body d-flex align-items-center">
-                            <div class="flex-grow-1">
-                                <h6 class="card-subtitle mb-1">@item.Membro.Nome</h6>
-                                <p class="card-text">@item.TipoContribuicao - @item.FormaPagto - @item.DataPagamento.ToString("dd/MM/yy")</p>
-                            </div>
-                            <h6 class="card-subtitle mb-1 text-success ms-auto"> @item.Valor.ToString("C", new CultureInfo("pt-BR"))</h6>
-                        </div>
-                </div>
-            </div>
-        }
-    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Nome</th>
+                <th scope="col">Contribuição</th>
+                <th scope="col">Forma de pagamento</th>
+                <th scope="col">Data de pagamento</th>
+                <th scope="col">Valor</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            @foreach (var item in Model.Lista)
+            {
+                <tr>
+                    <th scope="row"></th>
+                    <td>@item.Membro?.Nome</td>
+                    <td>@item.TipoContribuicao</td>
+                    <td>@item.FormaPagto</td>
+                    <td>@item.DataPagamento.ToString("dd/MM/yyyy")</td>
+                    <td>@item.Valor.ToString("C", new CultureInfo("pt-BR"))</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                <td>
+                    @Model.Lista.Sum(x => x.Valor).ToString("C", new CultureInfo("pt-BR"))
+                </td>
+            </tr>
+        </tfoot>
+
+    </table>
 
 </div>

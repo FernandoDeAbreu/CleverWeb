@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
 using CleverWeb.Data;
-using CleverWeb.Data.Reports;
 using CleverWeb.Features.Contribuicao.Services;
 using CleverWeb.Features.Contribuicao.ViewModels;
 using CleverWeb.Features.Membro.ViewModels;
+using CleverWeb.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
-using System.Globalization;
+using static CleverWeb.Data.Shared.Enums;
 
 namespace CleverWeb.Features.Contribuicao
 {
@@ -25,12 +25,10 @@ namespace CleverWeb.Features.Contribuicao
             _db = db;
             _mapper = mapper;
         }
-
-
-
+   
         public async Task<IActionResult> Index()
         {
-            var Contribuicao = await _db.Contribuicao
+            var Contribuicao = await _db.Contribuicao.Where(c => c.MotivoExclusao == null)
                  .Include(c => c.Membro)
                 .AsNoTracking()
                 .OrderByDescending(m => m.DataLancamanto).Take(20)
@@ -92,14 +90,15 @@ namespace CleverWeb.Features.Contribuicao
             return View(vm);
         }
 
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var contribuicao = _db.Contribuicao.Include(c => c.Membro).FirstOrDefault(m => m.Id == id);
+            var contribuicao = await _db.Contribuicao.FindAsync(id); 
 
             if (contribuicao == null)
                 return NotFound();
 
-            ViewBag.Membro = contribuicao.Membro.Nome;
+            ViewBag.MembroId = contribuicao.MembroId;
+
             var vm = _mapper.Map<ContribuicaoViewModel>(contribuicao);
             return View(vm);
         }
@@ -111,13 +110,18 @@ namespace CleverWeb.Features.Contribuicao
             if (id != model.Id)
                 return BadRequest();
 
+            if (!ModelState.IsValid)
+                return View(model);
+
             var entidade = await _db.Contribuicao.FindAsync(id);
+           
             if (entidade == null)
                 return NotFound();
 
+            model.DataExclusao = DateTime.Now;
+
             _mapper.Map(model, entidade);
 
-            _db.Contribuicao.Update(entidade);
             await _db.SaveChangesAsync();
 
             TempData["Success"] = "Contribuicao atualizado com sucesso!";
@@ -137,30 +141,27 @@ namespace CleverWeb.Features.Contribuicao
             return View(contribuicao);
         }
 
-        public async Task<IActionResult> Imprimir(int id)
+        public async Task<IActionResult> ImprimirComprovante(int id)
         {
-            var contribuicao = await _db.Contribuicao
-                 .Include(c => c.Membro)
-                 .FirstAsync(c => c.Id == id);
+            var document = await _contribuicaoService.ImprimirComprovante(id);
 
-            // Gera PDF
-            var document = new ReciboContribuicaoReport(contribuicao);
-            var pdf = document.GeneratePdf();
-            RedirectToAction(nameof(MembroList));
 
-            return File(pdf, "application/pdf", $"{contribuicao.TipoContribuicao}-{contribuicao.Id}.pdf");
+            return File(document, "application/pdf", $"Recibo-{id}.pdf");
+
         }
 
         public IActionResult Relatorio(FiltroContribuicaoViewModel filtro)
         {
-            var lista =  _contribuicaoService.Relatorio(filtro);
-            return View(lista);
+            var vm = _contribuicaoService.ObterRelatorio(filtro);
+            return View(vm);
         }
 
-        public async Task<IActionResult> ExportarPdfAsync(FiltroContribuicaoViewModel filtro)
+        public IActionResult ExportarPdf(FiltroContribuicaoViewModel filtro)
         {
-            var pdfBytes = await _contribuicaoService.ExportarPdf(filtro);
-            return File(pdfBytes, "application/pdf", "Contribuicoes.pdf");
+            var vm = _contribuicaoService.ObterRelatorio(filtro);
+            var pdf =  _contribuicaoService.ExportarPdf(vm);
+            return File(pdf, "application/pdf", "Contribuicoes.pdf");
         }
+
     }
 }

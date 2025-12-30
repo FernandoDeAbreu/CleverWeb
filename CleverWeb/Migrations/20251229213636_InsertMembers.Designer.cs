@@ -3,6 +3,7 @@ using System;
 using CleverWeb.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleverWeb.Migrations
 {
     [DbContext(typeof(CleverDbContext))]
-    partial class CleverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251229213636_InsertMembers")]
+    partial class InsertMembers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.22");
@@ -22,9 +25,6 @@ namespace CleverWeb.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("DataExclusao")
-                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DataLancamanto")
                         .HasColumnType("TEXT");
@@ -38,9 +38,6 @@ namespace CleverWeb.Migrations
                     b.Property<int>("MembroId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("MotivoExclusao")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("TipoContribuicao")
                         .HasColumnType("INTEGER");
 
@@ -52,56 +49,6 @@ namespace CleverWeb.Migrations
                     b.HasIndex("MembroId");
 
                     b.ToTable("Contribuicao");
-                });
-
-            modelBuilder.Entity("CleverWeb.Models.Despesa", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CaixaSaida")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("DataExclusao")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DataPagamento")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("FornecedorId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("MotivoExclusao")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Valor")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FornecedorId");
-
-                    b.ToTable("Despesa");
-                });
-
-            modelBuilder.Entity("CleverWeb.Models.Fornecedor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Fornecedor");
                 });
 
             modelBuilder.Entity("CleverWeb.Models.Membro", b =>
@@ -167,22 +114,6 @@ namespace CleverWeb.Migrations
                         .IsRequired();
 
                     b.Navigation("Membro");
-                });
-
-            modelBuilder.Entity("CleverWeb.Models.Despesa", b =>
-                {
-                    b.HasOne("CleverWeb.Models.Fornecedor", "Fornecedor")
-                        .WithMany("Despesas")
-                        .HasForeignKey("FornecedorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Fornecedor");
-                });
-
-            modelBuilder.Entity("CleverWeb.Models.Fornecedor", b =>
-                {
-                    b.Navigation("Despesas");
                 });
 
             modelBuilder.Entity("CleverWeb.Models.Membro", b =>

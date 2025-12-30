@@ -1,7 +1,7 @@
 ﻿using CleverWeb.Models;
-using QuestPDF.Infrastructure;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 
 namespace CleverWeb.Data.Reports
@@ -22,7 +22,7 @@ namespace CleverWeb.Data.Reports
 
                 page.Header().Element(ComposeHeader);
                 page.Content().Element(ComposeContent);
-                page.Footer().AlignCenter().Text("Documento gerado automaticamente");
+                page.Footer().AlignCenter().BorderBottom(0.5f);
             });
         }
 
@@ -30,13 +30,29 @@ namespace CleverWeb.Data.Reports
         {
             container.Column(col =>
             {
-                col.Item().Text("RECIBO DE CONTRIBUIÇÃO")
-                    .FontSize(20)
-                    .Bold()
-                    .AlignCenter();
-
-                col.Item().PaddingTop(10)
-                    .LineHorizontal(1);
+                col.Item()
+                 .BorderTop(0.5f)
+                 .BorderLeft(0.5f)
+                 .BorderRight(0.5f)
+                 .Text("IGREJA EVANGÉLICA ASSEMBLEIA DE DEUS - SETA").FontSize(18).Bold().AlignCenter();
+                col.Item()
+                  .BorderRight(0.5f)
+                  .BorderLeft(0.5f).Text($"{_contribuicao.Id}").FontSize(12).Italic().AlignRight();
+                col.Item()
+                 .BorderRight(0.5f)
+                 .BorderLeft(0.5f).Text(" Congregação: IEADA SHEKINAH ").FontSize(12);
+                col.Item()
+                 .BorderRight(0.5f)
+                 .BorderLeft(0.5f).Text(" Endereço: Rua Goias 1634 - Centro - Açailândia-MA").FontSize(12);
+                col.Item()
+                 .BorderRight(0.5f)
+                 .BorderLeft(0.5f)
+                 .Text("");
+                col.Item()
+                 .BorderBottom(0.5f)
+                 .BorderLeft(0.5f)
+                 .BorderRight(0.5f)
+                 .Text("COMADESMA FILIADA À CGADB").FontSize(14).Bold().AlignCenter();
             });
         }
 
@@ -46,6 +62,10 @@ namespace CleverWeb.Data.Reports
             {
                 col.Spacing(10);
 
+                col.Item().Text("RECIBO DE CONTRIBUIÇÃO VOLUNTÁRIA").Bold().AlignCenter(); 
+
+                col.Spacing(5);
+
                 col.Item().Text($"Membro: {_contribuicao.Membro?.Nome}");
                 col.Item().Text($"Tipo de Contribuição: {_contribuicao.TipoContribuicao}");
                 col.Item().Text($"Forma de Pagamento: {_contribuicao.FormaPagto}");
@@ -53,8 +73,13 @@ namespace CleverWeb.Data.Reports
                 col.Item().Text($"Data do Pagamento: {_contribuicao.DataPagamento:dd/MM/yyyy}");
 
                 col.Item().PaddingTop(20)
-                    .Text("Declaro que recebi a contribuição acima descrita.")
+                    .Text("Viva sob as promessas de malaquias 3.10")
                     .Italic();
+
+                col.Spacing(20);
+                col.Item().BorderTop(0.5f).Text("Pr. Fernando de Abreu Silva").AlignCenter()
+                   .Italic();
+
             });
         }
     }

@@ -13,7 +13,7 @@
 
     <div class="mb-3">
         <label asp-for="Nome" class="form-label"></label>
-        <input asp-for="Nome" class="form-control" placeholder="Digite o nome completo" />
+        <input asp-for="Nome" class="form-control" placeholder="Digite o nome completo" maxlength="25" />
         <span asp-validation-for="Nome" class="text-danger"></span>
     </div>
 
@@ -26,7 +26,7 @@
 
     <div class="mb-3">
         <label asp-for="Telefone" class="form-label"></label>
-        <input asp-for="Telefone" class="form-control" placeholder="(99) 99999-9999" />
+        <input asp-for="Telefone" class="form-control" placeholder="(99) 99999-9999" maxlength="16" />
         <span asp-validation-for="Telefone" class="text-danger"></span>
     </div>
 

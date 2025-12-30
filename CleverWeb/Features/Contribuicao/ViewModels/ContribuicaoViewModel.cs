@@ -26,5 +26,10 @@ namespace CleverWeb.Features.Contribuicao.ViewModels
         public DateTime DataPagamento { get; set; } = DateTime.Today;
 
         public DateTime DataLancamanto { get; set; } = DateTime.Today;
+
+        public DateTime DataExclusao { get; set; }
+
+        [Display(Name = "Motivo do extorno")]
+        public string? MotivoExclusao { get; set; }
     }
 }

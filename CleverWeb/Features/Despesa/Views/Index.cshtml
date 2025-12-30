@@ -1,49 +1,51 @@
-﻿@using CleverWeb.Features.Membro.ViewModels
-@model IEnumerable<MembroViewModel>
+﻿@using CleverWeb.Features.Despesa.ViewModels
+@using System.Globalization
+@model IEnumerable<DespesaViewModel>
 
 @{
-    ViewData["Title"] = "Membros";
+    ViewData["Title"] = "Despesas";
 }
 
-<h5 class="mb-3 fw-bold">
-    <i class="bi bi-people-fill text-primary"></i> Membros
+<h5 class="mb-3 fw-bold text-danger">
+    <i class="bi bi-graph-down-arrow text-danger"></i> Despesas
 </h5>
 
 <!-- Botão flutuante (ação primária) -->
 <a asp-action="Create"
-   asp-controller="Membro"
+   asp-controller="Despesa"
    class="fab-action bg-primary"
-   aria-label="Adicionar membro">
-    <i class="bi bi-person-plus-fill"></i>
+   aria-label="Adicionar despesa">
+    <i class="bi bi-plus-lg"></i>
 </a>
 
 <div class="list-group list-group-flush">
     @foreach (var item in Model)
     {
-        string[] partes = item.Nome.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        string iniciais = string.Join("", partes.Take(2).Select(p => p[0])).ToUpper();
-
-        <a asp-action="Edit"
-           asp-controller="Membro"
+        <a asp-action="Details"
+           asp-controller="Despesa"
            asp-route-id="@item.Id"
            class="list-group-item list-group-item-action py-3">
 
             <div class="d-flex align-items-center">
-                <!-- Avatar -->
-                <div class="avatar-circle bg-primary text-white">
-                    @iniciais
-                </div>
-
-                <!-- Nome -->
-                <div class="flex-grow-1 ms-3">
+                <div class="flex-grow-1">
                     <div class="fw-semibold text-dark">
-                        @item.Nome
+                        @item.Fornecedor?.Descricao
                     </div>
+
+                    <small class="text-muted d-block">
+                        @item.Descricao
+                    </small>
+
+                    <small class="text-muted">
+                        <i class="bi bi-calendar3"></i>
+                        @item.DataPagamento.ToString("dd/MM/yyyy")
+                    </small>
                 </div>
 
-                <!-- Ícone -->
-                <div class="ms-2 text-muted">
-                    <i class="bi bi-chevron-right"></i>
+                <div class="text-end ms-3">
+                    <span class="fw-bold text-danger">
+                        @item.Valor.ToString("C", new CultureInfo("pt-BR"))
+                    </span>
                 </div>
             </div>
         </a>
@@ -75,18 +77,6 @@
             transform: scale(.95);
         }
 
-    /* Avatar */
-    .avatar-circle {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        font-size: 1.1rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
     /* Lista */
     .list-group-item {
         border: 0;
@@ -107,5 +97,5 @@
         margin-bottom: 8px;
         border: 1px solid #eee;
     }
-       
+        
 </style>

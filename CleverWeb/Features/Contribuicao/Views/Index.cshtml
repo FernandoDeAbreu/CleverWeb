@@ -6,59 +6,98 @@
     ViewData["Title"] = "Contribuições";
 }
 
-<h2>Histórico</h2>
+<h5 class="mb-3 fw-bold text-primary">
+    <i class="bi bi-graph-up-arrow text-primary"></i> Histórico de Contribuições
+</h5>
 
-<div class="mb-0">
+<!-- FAB: Relatório -->
+<a asp-action="Relatorio"
+   asp-controller="Contribuicao"
+   class="fab-action bg-primary"
+   aria-label="Gerar relatório">
+    <i class="bi bi-file-earmark-pdf"></i>
+</a>
 
-    <!-- Botão flutuante -->
-    <a asp-action="Relatorio" asp-controller="Contribuicao" class="fab-whatsapp bg-primary">
-        <i class="bi bi-filetype-pdf"></i>
-    </a>
+<div class="list-group list-group-flush">
+    @foreach (var item in Model)
+    {
+        <a asp-action="Details"
+           asp-controller="Contribuicao"
+           asp-route-id="@item.Id"
+           class="list-group-item list-group-item-action py-3">
 
-    <div class="row">
-        @foreach (var item in Model)
-        {
-            <div class="col-md-12 mb-0">
-                <div class="card border-0 mb-1" >
-                    <a asp-action="Details" asp-controller="Contribuicao" asp-route-id="@item.Id"
-                       class="text-decoration-none text-dark">
-                            <div class="card-body d-flex align-items-center">
-                                <div class="flex-grow-1">
-                                    <h6 class="card-subtitle mb-1">@item.Membro.Nome</h6>
-                                <p class="card-text">@item.TipoContribuicao - @item.FormaPagto - @item.DataPagamento.ToString("dd/MM/yy")</p>
-                                </div>
-                            <h6 class="card-subtitle mb-1 text-success ms-auto"> @item.Valor.ToString("C", new CultureInfo("pt-BR"))</h6>
-                        </div>
-                    </a>
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <!-- Nome do membro -->
+                    <div class="fw-semibold text-dark">
+                        @item.Membro.Nome
+                    </div>
+
+                    <!-- Detalhes -->
+                    <small class="text-muted d-block">
+                        @item.TipoContribuicao • @item.FormaPagto
+                    </small>
+
+                    <small class="text-muted">
+                        <i class="bi bi-calendar3"></i>
+                        @item.DataPagamento.ToString("dd/MM/yyyy")
+                    </small>
+                </div>
+
+                <!-- Valor -->
+                <div class="text-end ms-3">
+                    <span class="fw-bold text-success">
+                        @item.Valor.ToString("C", new CultureInfo("pt-BR"))
+                    </span>
                 </div>
             </div>
-        }
-    </div>
-
+        </a>
+    }
 </div>
+
 
 <!-- CSS -->
 <style>
-    .fab-whatsapp {
+    /* Floating Action Button */
+    .fab-action {
         position: fixed;
-        width: 60px;
-        height: 60px;
-        bottom: 100px;
-        right: 20px;
-        color: #fff;
+        bottom: 80px;
+        right: 16px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
-        text-align: center;
-        font-size: 30px;
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-        z-index: 1000;
+        color: #fff;
+        font-size: 24px;
+        box-shadow: 0 6px 12px rgba(0,0,0,.25);
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        z-index: 1000;
+        transition: transform .2s ease, box-shadow .2s ease;
     }
 
-        .fab-whatsapp:hover {
-            transform: scale(1.1);
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.4);
+        .fab-action:active {
+            transform: scale(.95);
         }
+
+    /* Lista */
+    .list-group-item {
+        border: 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Desktop refinamento */
+    media (min-width: 768px) {
+        .fab-action
+
+    {
+        bottom: 40px;
+        right: 40px;
+    }
+
+    .list-group-item {
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #eee;
+    }
 </style>

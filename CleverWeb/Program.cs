@@ -1,6 +1,7 @@
 using CleverWeb.Data;
 using CleverWeb.Features.Auth.Services;
 using CleverWeb.Features.Contribuicao.Services;
+using CleverWeb.Features.Despesa.Services;
 using CleverWeb.Features.Membro.Validators;
 using CleverWeb.Features.Users.Services;
 using CleverWeb.Infrastructure.ViewLocation;
@@ -45,6 +46,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ContribuicaoService>();
+builder.Services.AddScoped<DespesaService>();
 
 
 var app = builder.Build();

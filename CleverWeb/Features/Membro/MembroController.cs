@@ -5,125 +5,128 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace CleverWeb.Features.Membro;
-
-[Authorize]
-public class MembroController : Controller
+namespace CleverWeb.Features.Membro
 {
-    private readonly CleverDbContext _db;
-    private readonly IMapper _mapper;
 
-    public MembroController(CleverDbContext db, IMapper mapper)
+    [Authorize]
+    public class MembroController : Controller
     {
-        _db = db;
-        _mapper = mapper;
-    }
+        private readonly CleverDbContext _db;
+        private readonly IMapper _mapper;
 
-    public async Task<IActionResult> Index()
-    {
-        var membros = await _db.Membro
-            .AsNoTracking()
-            .OrderBy(m => m.Nome)
-            .ToListAsync();
+        public MembroController(CleverDbContext db, IMapper mapper)
+        {
+            _db = db;
+            _mapper = mapper;
+        }
 
-        var vm = _mapper.Map<List<MembroViewModel>>(membros);
-        return View(vm);
-    }
+        public async Task<IActionResult> Index()
+        {
+            var membros = await _db.Membro
+                .AsNoTracking()
+                .OrderBy(m => m.Nome)
+                .ToListAsync();
 
-    public async Task<IActionResult> Details(int id)
-    {
-        var membro = await _db.Membro
-            .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            var vm = _mapper.Map<List<MembroViewModel>>(membros);
+            return View(vm);
+        }
 
-        if (membro == null)
-            return NotFound();
+        public async Task<IActionResult> Details(int id)
+        {
+            var membro = await _db.Membro
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == id);
 
-        return View(_mapper.Map<MembroViewModel>(membro));
-    }
+            if (membro == null)
+                return NotFound();
 
-    public IActionResult Create()
-    {
-        return View(new MembroViewModel());
-    }
+            return View(_mapper.Map<MembroViewModel>(membro));
+        }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(MembroViewModel model)
-    {
-        if (!ModelState.IsValid)
-            return View(model);
+        public IActionResult Create()
+        {
+            return View(new MembroViewModel());
+        }
 
-        var entidade = _mapper.Map<Models.Membro>(model);
-        entidade.DataCadastro = DateTime.UtcNow;
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(MembroViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
 
-        _db.Membro.Add(entidade);
-        await _db.SaveChangesAsync();
+            var entidade = _mapper.Map<Models.Membro>(model);
+            entidade.DataCadastro = DateTime.UtcNow;
 
-        TempData["Success"] = "Membro cadastrado com sucesso!";
+            _db.Membro.Add(entidade);
+            await _db.SaveChangesAsync();
 
-        return RedirectToAction(nameof(Index));
-    }
+            TempData["Success"] = "Membro cadastrado com sucesso!";
 
-    public async Task<IActionResult> Edit(int id)
-    {
-        var membro = await _db.Membro.FindAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
 
-        if (membro == null)
-            return NotFound();
+        public async Task<IActionResult> Edit(int id)
+        {
+            var membro = await _db.Membro.FindAsync(id);
 
-        return View(_mapper.Map<MembroViewModel>(membro));
-    }
+            if (membro == null)
+                return NotFound();
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, MembroViewModel model)
-    {
-        if (id != model.Id)
-            return BadRequest();
+            return View(_mapper.Map<MembroViewModel>(membro));
+        }
 
-        if (!ModelState.IsValid)
-            return View(model);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, MembroViewModel model)
+        {
+            if (id != model.Id)
+                return BadRequest();
 
-        var entidade = await _db.Membro.FindAsync(id);
-        if (entidade == null)
-            return NotFound();
+            if (!ModelState.IsValid)
+                return View(model);
 
-        _mapper.Map(model, entidade);
+            var entidade = await _db.Membro.FindAsync(id);
 
-        await _db.SaveChangesAsync();
+            if (entidade == null)
+                return NotFound();
 
-        TempData["Success"] = "Membro atualizado com sucesso!";
+            _mapper.Map(model, entidade);
 
-        return RedirectToAction(nameof(Index));
-    }
+            await _db.SaveChangesAsync();
 
-    public async Task<IActionResult> Delete(int id)
-    {
-        var membro = await _db.Membro
-            .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.Id == id);
+            TempData["Success"] = "Membro atualizado com sucesso!";
 
-        if (membro == null)
-            return NotFound();
+            return RedirectToAction(nameof(Index));
+        }
 
-        return View(_mapper.Map<MembroViewModel>(membro));
-    }
+        public async Task<IActionResult> Delete(int id)
+        {
+            var membro = await _db.Membro
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == id);
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
-    {
-        var membro = await _db.Membro.FindAsync(id);
+            if (membro == null)
+                return NotFound();
 
-        if (membro == null)
-            return NotFound();
+            return View(_mapper.Map<MembroViewModel>(membro));
+        }
 
-        _db.Membro.Remove(membro);
-        await _db.SaveChangesAsync();
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var membro = await _db.Membro.FindAsync(id);
 
-        TempData["Success"] = "Membro removido com sucesso!";
+            if (membro == null)
+                return NotFound();
 
-        return RedirectToAction(nameof(Index));
+            _db.Membro.Remove(membro);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Membro removido com sucesso!";
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
