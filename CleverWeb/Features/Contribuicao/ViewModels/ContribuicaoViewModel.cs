@@ -14,7 +14,7 @@ namespace CleverWeb.Features.Contribuicao.ViewModels
         [Required]
         [Range(0.01, 999999.99, ErrorMessage = "Informe um valor válido em reais.")]
         [DataType(DataType.Currency)]
-        public decimal Valor { get; set; } = decimal.Parse("0,00");
+        public decimal Valor { get; set; } 
 
         [Display(Name = "Contribuição")]
         public TipoContribuicao TipoContribuicao { get; set; }
