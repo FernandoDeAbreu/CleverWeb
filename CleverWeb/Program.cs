@@ -1,5 +1,6 @@
 using CleverWeb.Data;
 using CleverWeb.Features.Auth.Services;
+using CleverWeb.Features.Caixa.Services;
 using CleverWeb.Features.Contribuicao.Services;
 using CleverWeb.Features.Despesa.Services;
 using CleverWeb.Features.Membro.Validators;
@@ -47,6 +48,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ContribuicaoService>();
 builder.Services.AddScoped<DespesaService>();
+builder.Services.AddScoped<CaixaService>();
 
 
 var app = builder.Build();

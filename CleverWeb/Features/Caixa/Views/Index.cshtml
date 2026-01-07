@@ -1,0 +1,90 @@
+﻿@using CleverWeb.Features.Caixa.ViewModels
+@using System.Globalization
+@using static CleverWeb.Data.Shared.Enums
+@model RelatorioMovimentoCaixaViewModel
+
+@{
+    ViewData["Title"] = "Movimento de caixa";
+}
+
+@{
+    ViewData["Title"] = "Movimento do caixa";
+    var filtro = ViewBag.Filtro as FiltroMovimentoCaixaViewModel;
+}
+
+
+<h2 class="mb-3">
+    <i class="bi bi-clipboard-data"></i> Movimento do caixa
+</h2>
+
+
+<div class="mb-0">
+    <form method="get" class="mb-4">
+        <div class="row g-2 mb-2">
+            <div class="col-md-2">
+                <select asp-for="Filtro.TipoContribuicao"
+                        asp-items="Html.GetEnumSelectList<TipoContribuicao>()"
+                        class="form-select">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <input asp-for="Filtro.DataInicio" type="date" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <input asp-for="Filtro.DataFim" type="date" class="form-control" />
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <button formaction="@Url.Action("ExportarPdf")"
+                        formmethod="get"
+                        class="btn btn-danger">
+                    <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+                </button>
+            </div>
+        </div>
+    </form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Nome</th>
+                <th scope="col">Caixa</th>
+                <th scope="col">Data de pagamento</th>
+                <th scope="col">Valor</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            @foreach (var item in Model.Lista)
+            {
+                <tr>
+                    <th scope="row"></th>
+                    <td>@item.Tipo</td>
+                    <td>@item.Origem</td>
+                    <td>@item.TipoContribuicao</td>
+                    <td>@item.Data.ToString("dd/MM/yyyy")</td>
+                    <td>@item.Valor.ToString("C", new CultureInfo("pt-BR"))</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                <td>
+                    @Model.Lista.Sum(x => x.Valor).ToString("C", new CultureInfo("pt-BR"))
+                </td>
+            </tr>
+        </tfoot>
+
+    </table>
+
+</div>

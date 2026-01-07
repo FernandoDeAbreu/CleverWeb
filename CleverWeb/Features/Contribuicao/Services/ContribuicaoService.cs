@@ -21,10 +21,10 @@ namespace CleverWeb.Features.Contribuicao.Services
         public RelatorioContribuicaoViewModel ObterRelatorio(FiltroContribuicaoViewModel filtro)
         {
                  var query = _db.Contribuicao.Where(c => c.MotivoExclusao == null)
-               .Include(c => c.Membro)
-               .AsNoTracking()
-               .OrderByDescending(c => c.DataPagamento)
-               .AsQueryable();
+                                            .Include(c => c.Membro)
+                                            .AsNoTracking()
+                                            .OrderByDescending(c => c.DataPagamento)
+                                            .AsQueryable();
 
                    if (filtro.TipoContribuicao.HasValue)
                        query = query.Where(x => x.TipoContribuicao == filtro.TipoContribuicao);
