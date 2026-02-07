@@ -1,90 +1,107 @@
 ﻿@using CleverWeb.Features.Caixa.ViewModels
-@using System.Globalization
-@using static CleverWeb.Data.Shared.Enums
-@model RelatorioMovimentoCaixaViewModel
+@model IEnumerable<CaixaViewModel>
 
 @{
-    ViewData["Title"] = "Movimento de caixa";
+    ViewData["Title"] = "Caixas";
 }
 
-@{
-    ViewData["Title"] = "Movimento do caixa";
-    var filtro = ViewBag.Filtro as FiltroMovimentoCaixaViewModel;
-}
+<h5 class="mb-3 fw-bold">
+    <i class="bi bi-people-fill text-primary"></i> Caixas
+</h5>
 
+<!-- Botão flutuante (ação primária) -->
+<a asp-action="HistoricoCaixa"
+   asp-controller="Caixa"
+   class="fab-action bg-primary"
+   aria-label="Adicionar membro">
+    <i class="bi bi-person-plus-fill"></i>
+</a>
 
-<h2 class="mb-3">
-    <i class="bi bi-clipboard-data"></i> Movimento do caixa
-</h2>
+<div class="list-group list-group-flush">
+    @foreach (var item in Model)
+    {
+        <a asp-action="Movimento"
+           asp-controller="Caixa"
+           asp-route-id="@item.Id"
+           class="list-group-item list-group-item-action py-3">
 
+            <div class="d-flex align-items-center">
+                <!-- Avatar -->
+                <div class="avatar-circle bg-primary text-white">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
 
-<div class="mb-0">
-    <form method="get" class="mb-4">
-        <div class="row g-2 mb-2">
-            <div class="col-md-2">
-                <select asp-for="Filtro.TipoContribuicao"
-                        asp-items="Html.GetEnumSelectList<TipoContribuicao>()"
-                        class="form-select">
-                    <option value="">Todos</option>
-                </select>
+                <!-- Nome -->
+                <div class="flex-grow-1 ms-3">
+                    <div class="fw-semibold text-dark">
+                        Movimento @item.Id - @item.DtFechamento.ToShortDateString()
+                    </div>
+                </div>
+
+                <!-- Ícone -->
+                <div class="ms-2 text-muted">
+                    <i class="bi bi-chevron-right"></i>
+                </div>
             </div>
-
-            <div class="col-md-3">
-                <input asp-for="Filtro.DataInicio" type="date" class="form-control" />
-            </div>
-
-            <div class="col-md-3">
-                <input asp-for="Filtro.DataFim" type="date" class="form-control" />
-            </div>
-
-            <div class="col-md-2 d-grid">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-funnel"></i> Filtrar
-                </button>
-            </div>
-
-            <div class="col-md-2 d-grid">
-                <button formaction="@Url.Action("ExportarPdf")"
-                        formmethod="get"
-                        class="btn btn-danger">
-                    <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-                </button>
-            </div>
-        </div>
-    </form>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">Tipo</th>
-                <th scope="col">Nome</th>
-                <th scope="col">Caixa</th>
-                <th scope="col">Data de pagamento</th>
-                <th scope="col">Valor</th>
-            </tr>
-        </thead>
-        <tbody class="table-group-divider">
-            @foreach (var item in Model.Lista)
-            {
-                <tr>
-                    <th scope="row"></th>
-                    <td>@item.Tipo</td>
-                    <td>@item.Origem</td>
-                    <td>@item.TipoContribuicao</td>
-                    <td>@item.Data.ToString("dd/MM/yyyy")</td>
-                    <td>@item.Valor.ToString("C", new CultureInfo("pt-BR"))</td>
-                </tr>
-            }
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="4" class="text-end"><strong>Total:</strong></td>
-                <td>
-                    @Model.Lista.Sum(x => x.Valor).ToString("C", new CultureInfo("pt-BR"))
-                </td>
-            </tr>
-        </tfoot>
-
-    </table>
-
+        </a>
+    }
 </div>
+
+
+<!-- CSS -->
+<style>
+    /* Floating Action Button */
+    .fab-action {
+        position: fixed;
+        bottom: 80px;
+        right: 16px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        color: #fff;
+        font-size: 24px;
+        box-shadow: 0 6px 12px rgba(0,0,0,.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .fab-action:active {
+            transform: scale(.95);
+        }
+
+    /* Avatar */
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Lista */
+    .list-group-item {
+        border: 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Desktop refinamento */
+    media (min-width: 768px) {
+        .fab-action
+
+    {
+        bottom: 40px;
+        right: 40px;
+    }
+
+    .list-group-item {
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #eee;
+    }
+</style>

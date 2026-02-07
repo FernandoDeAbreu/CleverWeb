@@ -10,6 +10,7 @@ namespace CleverWeb.Features.Contribuicao.ViewModels
         public FormaPagto? FormaPagto { get; set; }
         public DateTime? DataInicio { get; set; } = DateTime.Today.AddDays(-7);
         public DateTime? DataFim { get; set; } = DateTime.Today;
+        public int CaixaId { get; set; }
     }
 
     public class RelatorioMovimentoCaixaViewModel

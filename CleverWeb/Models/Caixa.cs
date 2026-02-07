@@ -4,8 +4,7 @@
     {
         public int Id { get; set; }
         public DateTime DtFechamento { get; set; }
-        public decimal SaldoAnterior { get; set; }
-        public decimal SaldoAtual { get; set; }
+        public decimal Saldo { get; set; }
         public int UsuarioId { get; set; }
     }
 }

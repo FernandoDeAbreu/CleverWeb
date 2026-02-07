@@ -22,7 +22,7 @@ namespace CleverWeb.Models
 
         public string? MotivoExclusao { get; set; }
 
-        public int CaixaID { get; set; }
+        public int CaixaId { get; set; }
 
     }
 }
