@@ -1,0 +1,72 @@
+﻿@using CleverWeb.Features.Dashboard.ViewModels
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    var total = Model.SaldoCaixaDizimo + (decimal)Model.SaldoCaixaOfertas;
+}
+
+<div class="resumo">
+
+    <h3 class="resumo-titulo">Resumo Financeiro</h3>
+
+    <div class="resumo-item">
+        <span>Dízimos</span>
+        <span class="entrada">@Model.SaldoCaixaDizimo.ToString("C")</span>
+    </div>
+
+    <div class="resumo-item">
+        <span>Ofertas</span>
+        <span class="entrada">@Model.SaldoCaixaOfertas.ToString("C")</span>
+    </div>
+
+    <div class="resumo-total">
+        <span>Total em caixa</span>
+        <strong>@total.ToString("C")</strong>
+    </div>
+
+</div>
+
+
+<!-- CSS -->
+<style>
+    .resumo {
+        margin: 16px;
+    }
+
+    .resumo-titulo {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 12px;
+    }
+
+    .resumo-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        font-size: 15px;
+        color: #374151;
+    }
+
+    .entrada {
+        color: #15803d;
+        font-weight: 600;
+    }
+
+    .resumo-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        padding-top: 12px;
+        font-size: 15px;
+    }
+
+        .resumo-total strong {
+            font-size: 16px;
+            color: #111827;
+        }
+
+
+</style>
