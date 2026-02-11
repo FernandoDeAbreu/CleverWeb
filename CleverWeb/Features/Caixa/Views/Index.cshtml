@@ -5,17 +5,9 @@
     ViewData["Title"] = "Caixas";
 }
 
-<h5 class="mb-3 fw-bold">
-    <i class="bi bi-people-fill text-primary"></i> Caixas
-</h5>
-
-<!-- Botão flutuante (ação primária) -->
-<a asp-action="HistoricoCaixa"
-   asp-controller="Caixa"
-   class="fab-action bg-primary"
-   aria-label="Adicionar membro">
-    <i class="bi bi-person-plus-fill"></i>
-</a>
+<h2 class="mb-3">
+    <i class="bi bi-clipboard-data"></i> Histórico de mov. caixa
+</h2>
 
 <div class="list-group list-group-flush">
     @foreach (var item in Model)
@@ -50,29 +42,7 @@
 
 <!-- CSS -->
 <style>
-    /* Floating Action Button */
-    .fab-action {
-        position: fixed;
-        bottom: 80px;
-        right: 16px;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        color: #fff;
-        font-size: 24px;
-        box-shadow: 0 6px 12px rgba(0,0,0,.25);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        transition: transform .2s ease, box-shadow .2s ease;
-    }
-
-        .fab-action:active {
-            transform: scale(.95);
-        }
-
-    /* Avatar */
+   /* Avatar */
     .avatar-circle {
         width: 48px;
         height: 48px;

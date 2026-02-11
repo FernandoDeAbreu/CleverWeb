@@ -5,7 +5,9 @@
     ViewData["Title"] = @ViewBag.Membro;
 }
 
-<h2>@ViewBag.Membro</h2>
+<h2 class="mb-3">
+    @ViewBag.Membro
+</h2>
 
 <form asp-action="Edit" asp-controller="Contribuicao" method="post">
     @Html.AntiForgeryToken()

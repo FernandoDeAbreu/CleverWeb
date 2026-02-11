@@ -2,6 +2,112 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Shekinah</h1>
+<h5 class="mb-3 fw-bold text-primary">
+    Menu
+</h5>
+<div class="list-group list-group-flush">
+    <div class="d-flex align-items-center">
+        <a asp-controller="Membro" asp-action="Index" class="list-group-item list-group-item-action py-3">
+            <div class="d-flex align-items-center">
+                <!-- Avatar -->
+                <div class="avatar-circle">
+                    <i class="bi bi-people fs-5"></i>
+                </div>
+
+                <!-- Nome -->
+                <div class="flex-grow-1 ms-3">
+                    <div class="fw-semibold text-dark">
+                        Membros
+                    </div>
+                </div>
+
+                <!-- Ícone -->
+                <div class="ms-2 text-muted">
+                    <i class="bi bi-arrow-right-short"></i>
+                </div>
+            </div>
+
+        </a>
+    </div>
+    <div class="d-flex align-items-center">
+        <a asp-controller="Caixa" asp-action="Fechamento" class="list-group-item list-group-item-action py-3">
+            <div class="d-flex align-items-center">
+                <!-- Avatar -->
+                <div class="avatar-circle">
+                    <i class="bi bi-bank fs-5"></i>
+                </div>
+
+                <!-- Nome -->
+                <div class="flex-grow-1 ms-3">
+                    <div class="fw-semibold text-dark">
+                        Fechar caixa
+                    </div>
+                </div>
+
+                <!-- Ícone -->
+                <div class="ms-2 text-muted">
+                    <i class="bi bi-arrow-right-short"></i>
+                </div>
+            </div>
+
+        </a>
+    </div>
+    <div class="d-flex align-items-center">
+        <a asp-controller="Caixa" asp-action="Index" class="list-group-item list-group-item-action py-3">
+            <div class="d-flex align-items-center">
+                <!-- Avatar -->
+                <div class="avatar-circle">
+                    <i class="bi bi-file-bar-graph fs-5"></i>
+                </div>
+
+                <!-- Nome -->
+                <div class="flex-grow-1 ms-3">
+                    <div class="fw-semibold text-dark">
+                        Relatório de caixa
+                    </div>
+                </div>
+
+                <!-- Ícone -->
+                <div class="ms-2 text-muted">
+                    <i class="bi bi-arrow-right-short"></i>
+                </div>
+            </div>
+
+        </a>
+    </div>
+
+
+
+
 </div>
+<!-- CSS -->
+<style>
+
+    /* Avatar */
+    .avatar-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Lista */
+    .list-group-item {
+        border: 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Desktop refinamento */
+    media (min-width: 768px) {
+        .fab-action
+
+    {
+        bottom: 40px;
+        right: 40px;
+    }
+
+    .list-group-item {
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #eee;
+    }
+</style>

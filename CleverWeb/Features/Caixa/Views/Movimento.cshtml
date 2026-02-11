@@ -13,37 +13,71 @@
     <i class="bi bi-clipboard-data"></i> Movimento do caixa
 </h2>
 
+<!-- FAB: Relatório -->
+<a asp-controller="Caixa"
+   asp-action="ExportarPdf"
+   asp-route-id="@Model.Filtro.CaixaId"
+   class="bg-danger fab-action"
+   aria-label="Gerar relatório">
+    <i class="bi bi-file-earmark-pdf"></i>
+</a>
 
-<div class="list-group list-group-flush">
-    @foreach (var item in Model.Lista)
-    {
-        <a class="list-group-item list-group-item-action py-3">
+    <div class="list-group list-group-flush">
+        @foreach (var item in Model.Lista)
+        {
+            <a class="list-group-item list-group-item-action py-3">
 
-            <div class="d-flex align-items-center">
-                <div class="flex-grow-1">
-                    <!-- Nome do membro -->
-                    <div class="fw-semibold text-dark">
-                        @item.Origem
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <!-- Nome do membro -->
+                        <div class="fw-semibold text-dark">
+                            @item.Origem
+                        </div>
+
+                        <!-- Detalhes -->
+                        <small class="text-muted d-block">
+                            @item.Descricao
+                        </small>
+
+                        <small class="text-muted">
+                            <i class="bi bi-calendar3"></i>
+                            @item.Data.ToString("dd/MM/yyyy")
+                        </small>
                     </div>
 
-                    <!-- Detalhes -->
-                    <small class="text-muted d-block">
-                        @item.Descricao
-                    </small>
-
-                    <small class="text-muted">
-                        <i class="bi bi-calendar3"></i>
-                        @item.Data.ToString("dd/MM/yyyy")
-                    </small>
+                    <!-- Valor -->
+                    <div class="text-end ms-3">
+                        <span class="fw-bold @(item.Tipo == "Entrada" ? "text-success" : "text-danger")">
+                            @item.Valor.ToString("C", new CultureInfo("pt-BR"))
+                        </span>
+                    </div>
                 </div>
+            </a>
+        }
+    </div>
 
-                <!-- Valor -->
-                <div class="text-end ms-3">
-                    <span class="fw-bold @(item.Tipo == "Entrada" ? "text-success" : "text-danger")">
-                        @item.Valor.ToString("C", new CultureInfo("pt-BR"))
-                    </span>
-                </div>
-            </div>
-        </a>
+<!-- CSS -->
+<style>
+    /* Floating Action Button */
+    .fab-action {
+        position: fixed;
+        bottom: 80px;
+        right: 16px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        color: #fff;
+        font-size: 24px;
+        box-shadow: 0 6px 12px rgba(0,0,0,.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: transform .2s ease, box-shadow .2s ease;
     }
-</div>
+
+        .fab-action:active {
+            transform: scale(.95);
+        }
+
+</style>

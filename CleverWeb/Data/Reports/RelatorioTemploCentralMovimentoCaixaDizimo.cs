@@ -1,5 +1,6 @@
 ﻿using CleverWeb.Data.Reports.Models;
 using CleverWeb.Features.Contribuicao.ViewModels;
+using CleverWeb.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -7,7 +8,7 @@ using System.Globalization;
 
 namespace CleverWeb.Data.Reports
 {
-    public class RelatorioTemploCentralMovimentoCaixaDizimo(RelatorioMovimentoCaixaViewModel ralatorio) : IDocument
+    public class RelatorioTemploCentralMovimentoCaixaDizimo(RelatorioMovimentoCaixaViewModel ralatorio, Caixa caixa) : IDocument
     {
         private readonly RelatorioMovimentoCaixaViewModel _ralatorio = ralatorio;
 
@@ -47,7 +48,7 @@ namespace CleverWeb.Data.Reports
                      .BorderTop(0.5f)
                      .BorderRight(0.5f)
                      .BorderLeft(0.5f)
-                     .Text($" Movimento do caixa de {_ralatorio.Filtro.TipoContribuicao} no período {_ralatorio.Filtro.DataInicio:dd/MM/yyyy} à {_ralatorio.Filtro.DataFim:dd/MM/yyyy} ").FontSize(12).Bold().ParagraphSpacing(10);
+                     .Text($" Movimento do caixa de {_ralatorio.Filtro.TipoContribuicao} no período {caixa.DtInicial:dd/MM/yyyy} à {caixa.DtFinal:dd/MM/yyyy} ").FontSize(12).Bold().ParagraphSpacing(10);
                     col.Item()
                      .BorderRight(0.5f)
                      .BorderLeft(0.5f).Text(" Congregação: IEADA SHEKINAH | Endereço: Rua Goias - Centro - Açailândia-MA").FontSize(12);
@@ -105,24 +106,12 @@ namespace CleverWeb.Data.Reports
                     // Despesas
                     table.Cell().ColumnSpan(3).Border(0.5f).Text("DESPESAS E SAÍDAS").Bold().AlignCenter();
 
-                    table.Cell().ColumnSpan(2).Border(0.5f).Text($" Saída para convenção - 10%");
-                    table.Cell().ColumnSpan(1).Border(0.5f).Text($"{totais.Saida10.ToString("C", new CultureInfo("pt-BR"))}").AlignEnd();
-
-                    table.Cell().ColumnSpan(2).Border(0.5f).Text($" Saída para sede - 40%");
-                    table.Cell().ColumnSpan(1).Border(0.5f).Text($"{totais.Saida40.ToString("C", new CultureInfo("pt-BR"))}").AlignEnd();
-
-                    table.Cell().ColumnSpan(2).Border(0.5f).Text($" Auxílo eclesiástico - 30%");
-                    table.Cell().ColumnSpan(1).Border(0.5f).Text($"{totais.Saida30.ToString("C", new CultureInfo("pt-BR"))}").AlignEnd();
-                    table.Cell().ColumnSpan(2).BorderLeft(0.5f).BorderRight(0.5f).Text($" ");
-                    table.Cell().ColumnSpan(1).BorderLeft(0.5f).BorderRight(0.5f).Text($" ");
-
-
-                    // Linhas (exemplo)
+                    // Linhas
                     foreach (var item in _ralatorio.Lista)
                     {
                         if (item.Valor < 0)
                         {
-                            table.Cell().ColumnSpan(2).Border(0.5f).Text($" {item.Origem} - {item.Data:dd/MM/yyyy}");
+                            table.Cell().ColumnSpan(2).Border(0.5f).Text($" {item.Descricao}");
                             table.Cell().Border(0.5f).Text($"{item.Valor.ToString("C", new CultureInfo("pt-BR"))}  ").AlignEnd();
                         }
                     }
@@ -133,7 +122,7 @@ namespace CleverWeb.Data.Reports
                     table.Cell().ColumnSpan(3)
                     .BorderLeft(0.5f)
                     .BorderRight(0.5f)
-                    .Text($" Total de saídas  {totais.TotalSaidas.ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
+                    .Text($" Total de saídas  {_ralatorio.Lista.Where(m => m.Valor < 0).Sum(m => m.Valor).ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
                     table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).BorderBottom(0.5f).Text($" ");
                 });
         }

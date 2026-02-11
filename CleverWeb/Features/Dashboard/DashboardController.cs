@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using CleverWeb.Data;
 using CleverWeb.Features.Dashboard.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static CleverWeb.Data.Shared.Enums;
 
 namespace CleverWeb.Features.Home
 {
-    //  [Authorize]
+     [Authorize]
 
     public class DashboardController : Controller
     {

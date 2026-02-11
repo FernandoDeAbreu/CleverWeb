@@ -97,20 +97,21 @@ namespace CleverWeb.Features.Caixa.Services
 
             var caixa = await CriarNovoCaixa(relatorio);
 
+            await FecharCaixaDespesa(relatorio, caixa);
+
             await FecharCaixaContribuicao(relatorio, caixa);
 
-            await FecharCaixaDespesa(relatorio, caixa);
         }
 
         private async Task FecharCaixaContribuicao(RelatorioMovimentoCaixaViewModel relatorioContribuicao, Models.Caixa caixa)
         {
             var contribuicoes = relatorioContribuicao.Lista.Where(c => c.Tipo == "Entrada");
 
-            await SaidaParaConvencao10(contribuicoes);
+            await SaidaParaConvencao10(contribuicoes, caixa);
 
-            await SaidaParaConvencao40(contribuicoes);
+            await SaidaParaConvencao40(contribuicoes, caixa);
 
-            await SaidaParaConvencao30(contribuicoes);
+            await SaidaParaConvencao30(contribuicoes, caixa);
 
             foreach (var item in contribuicoes)
             {
@@ -121,7 +122,7 @@ namespace CleverWeb.Features.Caixa.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task SaidaParaConvencao10(IEnumerable<MovimentoCaixaViewModel> movimentoCaixas)
+        private async Task SaidaParaConvencao10(IEnumerable<MovimentoCaixaViewModel> movimentoCaixas, Models.Caixa caixa)
         {
             var dizimos = movimentoCaixas.Where(c => c.TipoContribuicao == Data.Shared.Enums.TipoContribuicao.Dízimo);
 
@@ -129,7 +130,7 @@ namespace CleverWeb.Features.Caixa.Services
 
             var depesa = new Models.Despesa
             {
-                CaixaId = 0,
+                CaixaId = caixa.Id,
                 DataPagamento = DateTime.Now,
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Dízimo,
                 Descricao = "10% - Saída para convenção",
@@ -140,7 +141,7 @@ namespace CleverWeb.Features.Caixa.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task SaidaParaConvencao40(IEnumerable<MovimentoCaixaViewModel> movimentoCaixas)
+        private async Task SaidaParaConvencao40(IEnumerable<MovimentoCaixaViewModel> movimentoCaixas, Models.Caixa caixa)
         {
             var dizimos = movimentoCaixas.Where(c => c.TipoContribuicao == Data.Shared.Enums.TipoContribuicao.Dízimo);
 
@@ -148,7 +149,7 @@ namespace CleverWeb.Features.Caixa.Services
 
             var depesa = new Models.Despesa
             {
-                CaixaId = 0,
+                CaixaId = caixa.Id,
                 DataPagamento = DateTime.Now,
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Dízimo,
                 Descricao = "40% - Saída para sede",
@@ -159,7 +160,7 @@ namespace CleverWeb.Features.Caixa.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task SaidaParaConvencao30(IEnumerable<MovimentoCaixaViewModel> movimentoCaixas)
+        private async Task SaidaParaConvencao30(IEnumerable<MovimentoCaixaViewModel> movimentoCaixas, Models.Caixa caixa)
         {
             var dizimos = movimentoCaixas.Where(c => c.TipoContribuicao == Data.Shared.Enums.TipoContribuicao.Dízimo);
 
@@ -167,7 +168,7 @@ namespace CleverWeb.Features.Caixa.Services
 
             var depesa = new Models.Despesa
             {
-                CaixaId = 0,
+                CaixaId = caixa.Id,
                 DataPagamento = DateTime.Now,
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Dízimo,
                 Descricao = "30% - Auxílo eclesiástico",
@@ -207,6 +208,8 @@ namespace CleverWeb.Features.Caixa.Services
             var caixa = new Models.Caixa
             {
                 DtFechamento = DateTime.Now,
+                DtInicial = relatorio.Filtro.DataInicio ?? DateTime.Now,
+                DtFinal = relatorio.Filtro.DataFim ?? DateTime.Now,
                 Saldo = (saldoDizimo - totalDespesas) + ultimoCaixa.Saldo,
                 UsuarioId = 1,
             };
@@ -239,9 +242,11 @@ namespace CleverWeb.Features.Caixa.Services
             return pdfBytes;
         }
 
-        private static byte[] RelatorioTemploCentralMovimentoCaixaDizimo(RelatorioMovimentoCaixaViewModel relatorioContribuicao)
+        private byte[] RelatorioTemploCentralMovimentoCaixaDizimo(RelatorioMovimentoCaixaViewModel relatorioContribuicao)
         {
-            var document = new RelatorioTemploCentralMovimentoCaixaDizimo(relatorioContribuicao);
+            var caixa = _context.Caixa.FirstOrDefault(c => c.Id == relatorioContribuicao.Filtro.CaixaId);
+
+            var document = new RelatorioTemploCentralMovimentoCaixaDizimo(relatorioContribuicao, caixa);
 
             var pdfBytes = document.GeneratePdf();
 
