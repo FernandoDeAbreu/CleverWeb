@@ -36,8 +36,6 @@ namespace CleverWeb.Features.Despesa.Services
         public async Task Create(DespesaViewModel model)
         {
             var entidade = _mapper.Map<Models.Despesa>(model);
-            entidade.DataPagamento = DateTime.UtcNow;
-
             _db.Despesa.Add(entidade);
             await _db.SaveChangesAsync();
         }

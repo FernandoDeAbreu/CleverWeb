@@ -1,4 +1,5 @@
-﻿using CleverWeb.Features.Contribuicao.ViewModels;
+﻿using CleverWeb.Data.Reports.Models;
+using CleverWeb.Features.Contribuicao.ViewModels;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -46,7 +47,7 @@ namespace CleverWeb.Data.Reports
                      .BorderTop(0.5f)
                      .BorderRight(0.5f)
                      .BorderLeft(0.5f)
-                     .Text($" Movimento do caixa de {_ralatorio.Filtro.TipoContribuicao} no período {_ralatorio.Filtro.DataInicio:dd/MM/yyyy} à {_ralatorio.Filtro.DataFim:dd/MM/yyyy} ").FontSize(12).Bold().ParagraphSpacing(10);
+                     .Text($" Movimento do caixa de {_ralatorio.Filtro.TipoContribuicao} no período {_ralatorio.Caixa.DtInicial:dd/MM/yyyy} à {_ralatorio.Caixa.DtFinal:dd/MM/yyyy} ").FontSize(12).Bold().ParagraphSpacing(10);
                     col.Item()
                      .BorderRight(0.5f)
                      .BorderLeft(0.5f).Text(" Congregação: IEADA SHEKINAH | Endereço: Rua Goias - Centro - Açailândia-MA").FontSize(12);
@@ -60,6 +61,7 @@ namespace CleverWeb.Data.Reports
 
         private void ComposeContent(IContainer container)
         {
+            var totais = CalcularTotal();
             container.Table(table =>
                 {
                     table.ColumnsDefinition(columns =>
@@ -72,17 +74,20 @@ namespace CleverWeb.Data.Reports
                     // Cabeçalho da tabela
                     table.Header(header =>
                     {
-                        header.Cell().Border(0.5f).Text("DATA").Bold().AlignCenter(); ;
-                        header.Cell().Border(0.5f).Text("DÍZIMOS E OFERTAS").Bold().AlignCenter(); ;
-                        header.Cell().Border(0.5f).Text("ENTRADAS").Bold().AlignCenter(); ;
+                        header.Cell().Border(0.5f).Text("DATA").Bold().AlignCenter(); 
+                        header.Cell().Border(0.5f).Text("CONTRIBUINTE").Bold().AlignCenter(); 
+                        header.Cell().Border(0.5f).Text("ENTRADAS").Bold().AlignCenter(); 
                     });
 
                     // Linhas (exemplo)
                     foreach (var item in _ralatorio.Lista)
                     {
-                        table.Cell().Border(0.5f).Text($" {item.Data:dd/MM/yyyy}");
-                        table.Cell().Border(0.5f).Text($" {item.Origem}");
-                        table.Cell().Border(0.5f).Text($"{item.Valor.ToString("C", new CultureInfo("pt-BR"))}  ").AlignEnd();
+                        if (item.Valor > 0)
+                        {
+                            table.Cell().Border(0.5f).Text($" {item.Data:dd/MM/yyyy}");
+                            table.Cell().Border(0.5f).Text($" {item.Origem}");
+                            table.Cell().Border(0.5f).Text($"{item.Valor.ToString("C", new CultureInfo("pt-BR"))}  ").AlignEnd();
+                        }
                     }
 
                     // Total entradas
@@ -91,7 +96,7 @@ namespace CleverWeb.Data.Reports
                     table.Cell().ColumnSpan(3)
                     .BorderLeft(0.5f)
                     .BorderRight(0.5f)
-                    .Text($" Total de entradas  {(_ralatorio.Total).ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
+                    .Text($" Total de entradas  {totais.TotalEntradas.ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
                     table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).BorderBottom(0.5f).Text($" ");
 
                     table.Cell().ColumnSpan(3).Text($" ");
@@ -100,18 +105,15 @@ namespace CleverWeb.Data.Reports
                     // Despesas
                     table.Cell().ColumnSpan(3).Border(0.5f).Text("DESPESAS E SAÍDAS").Bold().AlignCenter();
 
-                    table.Cell().ColumnSpan(2).Border(0.5f).Text($" 10% - Saída para convenção");
-                    table.Cell().ColumnSpan(1).Border(0.5f).Text($"{(_ralatorio.Total * 10 / 100).ToString("C", new CultureInfo("pt-BR"))}").AlignEnd();
-
-                    table.Cell().ColumnSpan(2).Border(0.5f).Text($" 40% - Saída para sede");
-                    table.Cell().ColumnSpan(1).Border(0.5f).Text($"{(_ralatorio.Total * 40 / 100).ToString("C", new CultureInfo("pt-BR"))}").AlignEnd();
-
-                    table.Cell().ColumnSpan(2).Border(0.5f).Text($" 30% - Auxílo eclesiástico");
-                    table.Cell().ColumnSpan(1).Border(0.5f).Text($"{(_ralatorio.Total * 30 / 100).ToString("C", new CultureInfo("pt-BR"))}").AlignEnd();
-
-                    table.Cell().ColumnSpan(2).Border(0.5f).Text($" 20% - Congregação");
-                    table.Cell().ColumnSpan(1).Border(0.5f).Text($"{(_ralatorio.Total * 20 / 100).ToString("C", new CultureInfo("pt-BR"))}").AlignEnd();
-
+                    // Linhas
+                    foreach (var item in _ralatorio.Lista)
+                    {
+                        if (item.Valor < 0)
+                        {
+                            table.Cell().ColumnSpan(2).Border(0.5f).Text($" {item.Descricao}");
+                            table.Cell().Border(0.5f).Text($"{item.Valor.ToString("C", new CultureInfo("pt-BR"))}  ").AlignEnd();
+                        }
+                    }
                     // Total Despesas
 
                     table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).Text($" ");
@@ -119,8 +121,19 @@ namespace CleverWeb.Data.Reports
                     table.Cell().ColumnSpan(3)
                     .BorderLeft(0.5f)
                     .BorderRight(0.5f)
-                    .Text($" Total de saídas  {(_ralatorio.Total).ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
+                    .Text($" Total de saídas  {_ralatorio.Lista.Where(m => m.Valor < 0).Sum(m => m.Valor).ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
                     table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).BorderBottom(0.5f).Text($" ");
+
+                    table.Cell().ColumnSpan(3).Text($" ");
+                    table.Cell().ColumnSpan(3).Text($" ");
+                    table.Cell().ColumnSpan(3).Text($" ");
+                    table.Cell().ColumnSpan(3).Text($" ");
+
+                    table.Cell().ColumnSpan(3)
+                    .Text($" Saldo anterior:  {_ralatorio.Caixa.SaldoAnterior.ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
+                    table.Cell().ColumnSpan(3).Text($" ");
+                    table.Cell().ColumnSpan(3)
+                    .Text($" Saldo atual:   {_ralatorio.Caixa.SaldoAtual.ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
                 });
         }
 
@@ -140,6 +153,28 @@ namespace CleverWeb.Data.Reports
                     table.Cell().ColumnSpan(1).Border(0.5f).Text($"  Visto");
                     table.Cell().ColumnSpan(2).Border(0.5f).Text($"  Recebido em:        /        /     ");
                 });
+        }
+
+        private TotalMovCaixaModel CalcularTotal()
+        {
+            var totalEntradas = _ralatorio.Lista.Where(m => m.Valor > 0).Sum(m => m.Valor);
+            var saida10 = _ralatorio.Lista.Where(m => m.Valor > 0).Sum(m => m.Valor * -1) * 10 / 100;
+            var saida30 = _ralatorio.Lista.Where(m => m.Valor > 0).Sum(m => m.Valor * -1) * 30 / 100;
+            var saida40 = _ralatorio.Lista.Where(m => m.Valor > 0).Sum(m => m.Valor * -1) * 40 / 100;
+
+            var totalSaidasFixas = saida10 + saida30 + saida40;
+
+            var totalSaidas = _ralatorio.Lista.Where(m => m.Valor < 0).Sum(m => m.Valor) + totalSaidasFixas;
+
+            return new TotalMovCaixaModel
+            {
+                TotalEntradas = totalEntradas,
+                Saida10 = saida10,
+                Saida30 = saida30,
+                Saida40 = saida40,
+                TotalSaidasFixas = totalSaidasFixas,
+                TotalSaidas = totalSaidas,
+            };
         }
     }
 }

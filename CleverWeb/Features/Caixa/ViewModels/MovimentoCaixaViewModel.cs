@@ -10,7 +10,6 @@ namespace CleverWeb.Features.Caixa.ViewModels
         public string Descricao { get; set; }
         public decimal Valor { get; set; }
         public FormaPagto FormaPagto { get; set; }
-      
         public TipoContribuicao? TipoContribuicao { get; set; } 
         public string Tipo { get; set; } // Entrada | Saída
         public string Origem { get; set; } // Membro | Fornecedor

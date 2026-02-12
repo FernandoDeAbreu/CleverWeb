@@ -12,43 +12,20 @@
 
 <body class="bg-light d-flex flex-column min-vh-100">
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-        <div class="container">
+    <!-- NAVBAR SUPERIOR -->
+    <nav class="navbar navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
             <a class="navbar-brand fw-bold d-flex align-items-center" asp-controller="Dashboard" asp-action="Index">
                 <i class="bi bi-people-fill me-2"></i> SHEKINAH
             </a>
         </div>
     </nav>
 
-    <!-- NAVBAR -->
-    <nav class="navbar bg-light fixed-bottom shadow-sm">
-        <div class="container-fluid justify-content-around text-center">
-            <a asp-controller="Dashboard" asp-action="Index" class="text-dark text-decoration-none">
-                <i class="bi bi-house-fill fs-5"></i>
-                <div>Início</div>
-            </a>
-            <a asp-controller="Contribuicao" asp-action="MembroList" class="text-dark text-decoration-none">
-                <i class="bi bi-cash-stack fs-5"></i>
-                <div>Contribuições</div>
-            </a>
-            <a asp-controller="Despesa" asp-action="Index" class="text-dark text-decoration-none">
-                <i class="bi bi-upc-scan fs-5"></i>
-                <div>Despesas</div>
-            </a>
-            <a asp-controller="Home" asp-action="Index" class="text-dark text-decoration-none">
-                <i class="bi bi-node-plus fs-5"></i>
-                <div>Mais</div>
-            </a>
-        </div>
-    </nav>
-
-
     <!-- CONTEÚDO -->
-    <main class="container-fluid py-4 flex-grow-1" style="min-height:100vh;">
+    <main class="container py-4 flex-grow-1">
         @if (TempData["Success"] != null)
         {
-            <div class="alert alert-success alert-dismissible fade show shadow-sm">
+            <div class="alert alert-success alert-dismissible fade show shadow-sm text-center">
                 <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
@@ -57,23 +34,49 @@
         @RenderBody()
     </main>
 
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+    <!-- NAVBAR INFERIOR -->
+    <nav class="navbar bg-white fixed-bottom shadow-sm border-top">
+        <div class="container-fluid justify-content-around text-center">
+            <a asp-controller="Dashboard" asp-action="Index" class="text-dark text-decoration-none">
+                <i class="bi bi-house-fill fs-4"></i>
+                <div class="small">Início</div>
+            </a>
+            <a asp-controller="Contribuicao" asp-action="MembroList" class="text-dark text-decoration-none">
+                <i class="bi bi-cash-stack fs-4"></i>
+                <div class="small">Contribuições</div>
+            </a>
+            <a asp-controller="Despesa" asp-action="Index" class="text-dark text-decoration-none">
+                <i class="bi bi-upc-scan fs-4"></i>
+                <div class="small">Despesas</div>
+            </a>
+            <a asp-controller="Home" asp-action="Index" class="text-dark text-decoration-none">
+                <i class="bi bi-node-plus fs-4"></i>
+                <div class="small">Mais</div>
+            </a>
+        </div>
+    </nav>
 
+    <style>
         body {
-            display: flex;
-            flex-direction: column;
+            font-family: 'Segoe UI', sans-serif;
         }
 
         main {
-            flex-grow: 1;
+            padding-bottom: 80px; /* espaço para não ficar escondido atrás da navbar inferior */
+        }
+
+        .navbar.fixed-bottom i {
+            font-size: 1.5rem;
+        }
+
+        .navbar.fixed-bottom div {
+            font-size: 0.75rem;
+        }
+
+        .alert {
+            border-radius: 12px;
         }
     </style>
-   
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>

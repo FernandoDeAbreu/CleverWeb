@@ -53,15 +53,7 @@ namespace CleverWeb.Features.Caixa
 
         public IActionResult ExportarPdf(int Id)
         {
-            var filtro = new FiltroMovimentoCaixaViewModel
-            {
-                CaixaId = Id,
-                TipoContribuicao = Enums.TipoContribuicao.Dízimo,
-                DataFim = null,
-                DataInicio = null,
-            };
-
-            var vm = _caixaService.ObterRelatorio(filtro);
+            var vm = _caixaService.ObterDados(Id);
             var pdf = _caixaService.ExportarPdf(vm);
             return File(pdf, "application/pdf", "Contribuicoes.pdf");
         }

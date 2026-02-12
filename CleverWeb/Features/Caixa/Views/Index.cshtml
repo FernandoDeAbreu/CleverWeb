@@ -18,16 +18,15 @@
            class="list-group-item list-group-item-action py-3">
 
             <div class="d-flex align-items-center">
-                <!-- Avatar -->
-                <div class="avatar-circle bg-primary text-white">
-                    <i class="bi bi-cash-stack"></i>
-                </div>
-
-                <!-- Nome -->
-                <div class="flex-grow-1 ms-3">
+                <div class="flex-grow-1">
                     <div class="fw-semibold text-dark">
-                        Movimento @item.Id - @item.DtFechamento.ToShortDateString()
+                      Mov. do caixa @item.TipoContribuicao
                     </div>
+
+                    <small class="text-muted">
+                        <i class="bi bi-calendar3"></i>
+                        Período @item.DtFinal.ToString("dd/MM/yyyy") à  @item.DtFinal.ToString("dd/MM/yyyy")
+                    </small>
                 </div>
 
                 <!-- Ícone -->

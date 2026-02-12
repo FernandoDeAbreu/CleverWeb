@@ -17,6 +17,7 @@ namespace CleverWeb.Features.Contribuicao.ViewModels
     {
         public FiltroMovimentoCaixaViewModel Filtro { get; set; } = new();
         public IEnumerable<MovimentoCaixaViewModel> Lista { get; set; } = Enumerable.Empty<MovimentoCaixaViewModel>();
+        public CaixaViewModel Caixa { get; set; } = new();
         public decimal Total => Lista.Sum(x => x.Valor);
     }
 }

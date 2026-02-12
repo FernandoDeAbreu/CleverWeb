@@ -10,17 +10,30 @@
 
 
 <h2 class="mb-3">
-    <i class="bi bi-clipboard-data"></i> Movimento do caixa
+    <i class="bi bi-clipboard-data"></i> Saldos
 </h2>
 
-<!-- FAB: Relatório -->
-<a asp-controller="Caixa"
-   asp-action="ExportarPdf"
-   asp-route-id="@Model.Filtro.CaixaId"
-   class="bg-danger fab-action"
-   aria-label="Gerar relatório">
-    <i class="bi bi-file-earmark-pdf"></i>
-</a>
+<div class="saldo-box">
+
+    <div class="saldo-item">
+        <span class="fw-semibold text-dark">Anterior</span>
+        <span class="saldo-valor anterior">
+            @Model.Caixa.SaldoAnterior.ToString("C", new CultureInfo("pt-BR"))
+        </span>
+    </div>
+
+    <div class="saldo-item destaque">
+        <span class="fw-semibold text-dark">Atual</span>
+        <span class="saldo-valor atual">
+            @Model.Caixa.SaldoAtual.ToString("C", new CultureInfo("pt-BR"))
+        </span>
+    </div>
+
+</div>
+
+<h2 class="mb-3">
+     Movimento do caixa
+</h2>
 
     <div class="list-group list-group-flush">
         @foreach (var item in Model.Lista)
@@ -56,9 +69,18 @@
         }
     </div>
 
+<!-- FAB: Relatório -->
+<a asp-controller="Caixa"
+   asp-action="ExportarPdf"
+   asp-route-id="@Model.Filtro.CaixaId"
+   class="bg-danger fab-action"
+   aria-label="Gerar relatório">
+    <i class="bi bi-file-earmark-pdf"></i>
+</a>
+
 <!-- CSS -->
 <style>
-    /* Floating Action Button */
+
     .fab-action {
         position: fixed;
         bottom: 80px;
@@ -73,11 +95,58 @@
         align-items: center;
         justify-content: center;
         z-index: 1000;
-        transition: transform .2s ease, box-shadow .2s ease;
+        transition: transform .15s ease, box-shadow .15s ease;
     }
 
         .fab-action:active {
-            transform: scale(.95);
+            transform: scale(.96);
         }
+
+    .saldo-box {
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        background: #fff;
+    }
+
+    .saldo-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 0;
+    }
+
+    .saldo-label {
+        font-size: 13px;
+        color: #6b7280;
+        letter-spacing: .2px;
+    }
+
+    .saldo-valor {
+        font-weight: 600;
+        font-size: 15px;
+    }
+
+        .saldo-valor.anterior {
+            color: #4b5563;
+        }
+
+   
+    .saldo-item.destaque {
+        margin-top: 2px;
+    }
+
+    .saldo-valor.atual {
+        font-size: 24px;
+        font-weight: 700;
+        color: #198754;
+    }
+
+    .saldo-box::after {
+        content: "";
+        display: block;
+        margin-top: 10px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
 
 </style>

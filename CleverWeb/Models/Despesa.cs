@@ -10,7 +10,7 @@ namespace CleverWeb.Models
 
         public decimal Valor { get; set; } = decimal.Parse("0,00");
 
-        public DateTime DataPagamento { get; set; } = DateTime.Today;
+        public DateTime DataPagamento { get; set; } 
 
         public TipoContribuicao CaixaSaida { get; set; }
 

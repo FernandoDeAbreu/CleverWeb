@@ -21,10 +21,7 @@
 <div class="list-group list-group-flush">
     @foreach (var item in Model)
     {
-        <a asp-action="Details"
-           asp-controller="Despesa"
-           asp-route-id="@item.Id"
-           class="list-group-item list-group-item-action py-3">
+        <a class="list-group-item list-group-item-action py-3">
 
             <div class="d-flex align-items-center">
                 <div class="flex-grow-1">
