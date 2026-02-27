@@ -1,0 +1,76 @@
+﻿@using CleverWeb.Features.Caixa.ViewModels
+@model IEnumerable<CaixaViewModel>
+
+@{
+    ViewData["Title"] = "Caixas";
+}
+
+<h2 class="mb-3">
+    <i class="bi bi-clipboard-data"></i> Histórico de mov. caixa
+</h2>
+
+<div class="list-group list-group-flush">
+    @foreach (var item in Model)
+    {
+        <a asp-action="Movimento"
+           asp-controller="Caixa"
+           asp-route-id="@item.Id"
+           class="list-group-item list-group-item-action py-3">
+
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="fw-semibold text-dark">
+                      Mov. do caixa @item.TipoContribuicao
+                    </div>
+
+                    <small class="text-muted">
+                        <i class="bi bi-calendar3"></i>
+                        Período @item.DtFinal.ToString("dd/MM/yyyy") à  @item.DtFinal.ToString("dd/MM/yyyy")
+                    </small>
+                </div>
+
+                <!-- Ícone -->
+                <div class="ms-2 text-muted">
+                    <i class="bi bi-chevron-right"></i>
+                </div>
+            </div>
+        </a>
+    }
+</div>
+
+
+<!-- CSS -->
+<style>
+   /* Avatar */
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Lista */
+    .list-group-item {
+        border: 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Desktop refinamento */
+    media (min-width: 768px) {
+        .fab-action
+
+    {
+        bottom: 40px;
+        right: 40px;
+    }
+
+    .list-group-item {
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #eee;
+    }
+</style>

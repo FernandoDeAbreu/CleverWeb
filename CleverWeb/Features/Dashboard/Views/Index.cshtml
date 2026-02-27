@@ -1,0 +1,159 @@
+﻿@using CleverWeb.Features.Dashboard.ViewModels
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    var total = Model.SaldoCaixaDizimo + Model.SaldoCaixaOfertas + Model.SaldoCaixaMissao;
+}
+R
+<div class="dashboard">
+
+    <div class="saldo-total-card">
+        <span class="label">Saldo total</span>
+        <strong class="valor">@total.ToString("C")</strong>
+    </div>
+
+    <div class="cards-container">
+        <div class="saldo-card dizimo">
+            <i class="bi bi-piggy-bank-fill text-primary fs-3 mb-2"></i>
+            <span class="titulo">Dízimos</span>
+            <span class="valor">@Model.SaldoCaixaDizimo.ToString("C")</span>
+        </div>
+
+        <div class="saldo-card ofertas">
+            <i class="bi bi-gift-fill text-warning fs-3 mb-2"></i>
+            <span class="titulo">Ofertas</span>
+            <span class="valor">@Model.SaldoCaixaOfertas.ToString("C")</span>
+        </div>
+
+        <div class="saldo-card missoes">
+            <i class="bi bi-globe2 text-success fs-3 mb-2"></i>
+            <span class="titulo">Missões</span>
+            <span class="valor">@Model.SaldoCaixaMissao.ToString("C")</span>
+        </div>
+    </div>
+</div>
+
+<h3 class="mb-3">
+    Últimas atividades
+</h3>
+
+<div class="list-group list-group-flush">
+    @foreach (var item in Model.Lista)
+    {
+        <a class="list-group-item list-group-item-action py-3">
+
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <!-- Nome do membro -->
+                    <div class="fw-semibold text-dark">
+                        @item.Origem
+                    </div>
+
+                    <!-- Detalhes -->
+                    <small class="text-muted d-block">
+                        @item.Descricao
+                    </small>
+
+                    <small class="text-muted">
+                        <i class="bi bi-calendar3"></i>
+                        @item.Data.ToString("dd/MM/yyyy")
+                    </small>
+                </div>
+
+                <!-- Valor -->
+                <div class="text-end ms-3">
+                    <span class="fw-bold @(item.Tipo == "Entrada" ? "text-success" : "text-danger")">
+                        @item.Valor.ToString("C")
+                    </span>
+                </div>
+            </div>
+        </a>
+    }
+</div>
+
+
+<!-- CSS -->
+<style>
+    body {
+        background: #f5f6fa;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .dashboard {
+        padding: 20px;
+    }
+
+    .saldo-total-card {
+        background: linear-gradient(135deg, #00c4b3, #007b8f);
+        color: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+        .saldo-total-card .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .saldo-total-card .valor {
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 8px;
+            display: block;
+        }
+
+    .cards-container {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .saldo-card {
+        flex: 1;
+        min-width: 120px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease;
+    }
+
+        .saldo-card:hover {
+            transform: translateY(-4px);
+        }
+
+    .icone {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .titulo {
+        font-size: 14px;
+        color: #555;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .valor {
+        font-size: 18px;
+        font-weight: bold;
+        color: #111;
+    }
+
+    /* Diferenciação por categoria */
+    .dizimo .icone {
+        color: #007b8f;
+    }
+
+    .ofertas .icone {
+        color: #ff9800;
+    }
+
+    .missoes .icone {
+        color: #4caf50;
+    }
+</style>

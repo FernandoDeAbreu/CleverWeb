@@ -22,7 +22,7 @@ namespace CleverWeb.Features.Despesa.ViewModels
 
         public TipoContribuicao CaixaSaida { get; set; }
 
-        [Display(Name = "Fornecedor")]
+        [Display(Name = "Origem da despesa")]
 
         public int FornecedorId { get; set; }
 

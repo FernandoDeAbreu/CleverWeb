@@ -14,5 +14,6 @@ namespace CleverWeb.Models
         public DateTime DataLancamanto { get; set; }
         public DateTime DataExclusao { get; set; }
         public string? MotivoExclusao { get; set; }
+        public int CaixaID { get; set; }
     }
 }

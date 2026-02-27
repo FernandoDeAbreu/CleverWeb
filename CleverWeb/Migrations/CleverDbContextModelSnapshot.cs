@@ -17,10 +17,45 @@ namespace CleverWeb.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.22");
 
+            modelBuilder.Entity("CleverWeb.Models.Caixa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DtFechamento")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DtFinal")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DtInicial")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("SaldoAnterior")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("SaldoAtual")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("TipoContribuicao")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Caixa");
+                });
+
             modelBuilder.Entity("CleverWeb.Models.Contribuicao", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CaixaID")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("DataExclusao")
@@ -58,6 +93,9 @@ namespace CleverWeb.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CaixaId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("CaixaSaida")

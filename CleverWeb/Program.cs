@@ -1,5 +1,6 @@
 using CleverWeb.Data;
 using CleverWeb.Features.Auth.Services;
+using CleverWeb.Features.Caixa.Services;
 using CleverWeb.Features.Contribuicao.Services;
 using CleverWeb.Features.Despesa.Services;
 using CleverWeb.Features.Membro.Validators;
@@ -43,10 +44,20 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
     });
 
+// adicionar session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ContribuicaoService>();
 builder.Services.AddScoped<DespesaService>();
+builder.Services.AddScoped<CaixaService>();
 
 
 var app = builder.Build();
@@ -58,13 +69,13 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
 app.Run();

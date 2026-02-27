@@ -1,0 +1,94 @@
+﻿@using CleverWeb.Features.Caixa.ViewModels
+@using System.Globalization
+@using static CleverWeb.Data.Shared.Enums
+@model RelatorioMovimentoCaixaViewModel
+
+@{
+    ViewData["Title"] = "Fechamento de caixa";
+    var filtro = ViewBag.Filtro as FiltroMovimentoCaixaViewModel;
+}
+
+
+<h2 class="mb-3">
+    <i class="bi bi-clipboard-data"></i> Fechamento do caixa
+</h2>
+
+
+<div class="mb-0">
+    <form method="get" class="mb-4">
+        <div class="row g-2 mb-2">
+            <div class="col-md-2">
+                <label asp-for="Filtro.TipoContribuicao" class="form-label"></label>
+
+                <select asp-for="Filtro.TipoContribuicao"
+                        asp-items="Html.GetEnumSelectList<TipoContribuicao>()"
+                        class="form-select">
+                </select>
+
+                <span asp-validation-for="Filtro.TipoContribuicao"
+                      class="text-danger"></span>
+            </div>
+
+
+            <div class="col-md-3">
+                <label asp-for="Filtro.DataInicio" class="form-label"></label>
+                <input asp-for="Filtro.DataInicio" type="date" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="Filtro.DataFim" class="form-label"></label>
+                <input asp-for="Filtro.DataFim" type="date" class="form-control" />
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <button formaction="@Url.Action("FecharCaixa")"
+                        formmethod="get"
+                        disabled="@(!Model.Lista.Any())"
+                        class="btn btn-danger">
+                    <i class=""></i> Fechar caixa
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="list-group list-group-flush">
+        @foreach (var item in Model.Lista)
+        {
+            <a class="list-group-item list-group-item-action py-3">
+
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <!-- Nome do membro -->
+                        <div class="fw-semibold text-dark">
+                            @item.Origem
+                        </div>
+
+                        <!-- Detalhes -->
+                        <small class="text-muted d-block">
+                            @item.Descricao
+                        </small>
+
+                        <small class="text-muted">
+                            <i class="bi bi-calendar3"></i>
+                            @item.Data.ToString("dd/MM/yyyy")
+                        </small>
+                    </div>
+
+                    <!-- Valor -->
+                    <div class="text-end ms-3">
+                        <span class="fw-bold @(item.Tipo == "Entrada" ? "text-success" : "text-danger")">
+                            @item.Valor.ToString("C", new CultureInfo("pt-BR"))
+                        </span>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+
+</div>

@@ -11,6 +11,7 @@ namespace CleverWeb.Data
         public DbSet<Contribuicao> Contribuicao { get; set; } = null!;
         public DbSet<Despesa> Despesa { get; set; } = null!;
         public DbSet<Fornecedor> Fornecedor { get; set; } = null!;
+        public DbSet<Caixa> Caixa { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,7 +31,6 @@ namespace CleverWeb.Data
             .HasOne(c => c.Fornecedor)
             .WithMany(m => m.Despesas)
             .HasForeignKey(c => c.FornecedorId);
-
         }
     }
 }

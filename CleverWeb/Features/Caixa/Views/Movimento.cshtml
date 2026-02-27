@@ -1,0 +1,152 @@
+﻿@using CleverWeb.Features.Caixa.ViewModels
+@using System.Globalization
+@using static CleverWeb.Data.Shared.Enums
+@model RelatorioMovimentoCaixaViewModel
+
+@{
+    ViewData["Title"] = "Movimento do caixa";
+    var filtro = ViewBag.Filtro as FiltroMovimentoCaixaViewModel;
+}
+
+
+<h2 class="mb-3">
+    <i class="bi bi-clipboard-data"></i> Saldos
+</h2>
+
+<div class="saldo-box">
+
+    <div class="saldo-item">
+        <span class="fw-semibold text-dark">Anterior</span>
+        <span class="saldo-valor anterior">
+            @Model.Caixa.SaldoAnterior.ToString("C", new CultureInfo("pt-BR"))
+        </span>
+    </div>
+
+    <div class="saldo-item destaque">
+        <span class="fw-semibold text-dark">Atual</span>
+        <span class="saldo-valor atual">
+            @Model.Caixa.SaldoAtual.ToString("C", new CultureInfo("pt-BR"))
+        </span>
+    </div>
+
+</div>
+
+<h2 class="mb-3">
+     Movimento do caixa
+</h2>
+
+    <div class="list-group list-group-flush">
+        @foreach (var item in Model.Lista)
+        {
+            <a class="list-group-item list-group-item-action py-3">
+
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <!-- Nome do membro -->
+                        <div class="fw-semibold text-dark">
+                            @item.Origem
+                        </div>
+
+                        <!-- Detalhes -->
+                        <small class="text-muted d-block">
+                            @item.Descricao
+                        </small>
+
+                        <small class="text-muted">
+                            <i class="bi bi-calendar3"></i>
+                            @item.Data.ToString("dd/MM/yyyy")
+                        </small>
+                    </div>
+
+                    <!-- Valor -->
+                    <div class="text-end ms-3">
+                        <span class="fw-bold @(item.Tipo == "Entrada" ? "text-success" : "text-danger")">
+                            @item.Valor.ToString("C", new CultureInfo("pt-BR"))
+                        </span>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+
+<!-- FAB: Relatório -->
+<a asp-controller="Caixa"
+   asp-action="ExportarPdf"
+   asp-route-id="@Model.Filtro.CaixaId"
+   class="bg-danger fab-action"
+   aria-label="Gerar relatório">
+    <i class="bi bi-file-earmark-pdf"></i>
+</a>
+
+<!-- CSS -->
+<style>
+
+    .fab-action {
+        position: fixed;
+        bottom: 80px;
+        right: 16px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        color: #fff;
+        font-size: 24px;
+        box-shadow: 0 6px 12px rgba(0,0,0,.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+        .fab-action:active {
+            transform: scale(.96);
+        }
+
+    .saldo-box {
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        background: #fff;
+    }
+
+    .saldo-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 0;
+    }
+
+    .saldo-label {
+        font-size: 13px;
+        color: #6b7280;
+        letter-spacing: .2px;
+    }
+
+    .saldo-valor {
+        font-weight: 600;
+        font-size: 15px;
+    }
+
+        .saldo-valor.anterior {
+            color: #4b5563;
+        }
+
+   
+    .saldo-item.destaque {
+        margin-top: 2px;
+    }
+
+    .saldo-valor.atual {
+        font-size: 24px;
+        font-weight: 700;
+        color: #198754;
+    }
+
+    .saldo-box::after {
+        content: "";
+        display: block;
+        margin-top: 10px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+
+</style>
