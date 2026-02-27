@@ -3,7 +3,7 @@
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-deploy:
@@ -37,4 +37,4 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
-          sudo systemctl restart minhaapi
+          sudo systemctl restart cleverweb
