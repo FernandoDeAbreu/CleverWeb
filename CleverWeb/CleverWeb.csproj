@@ -25,4 +25,8 @@
     <Folder Include="Features\Dashboard\Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include=".github\workflows\deploy.yml" />
+  </ItemGroup>
+
 </Project>

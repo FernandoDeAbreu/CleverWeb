@@ -1,0 +1,25 @@
+﻿<link rel="stylesheet" href="~/css/quiz.css" />
+@model CleverWeb.Features.Quizz.Question
+
+<div class="quiz-container">
+
+    <h1>UMADSHEK</h1>
+
+    <form method="get" asp-action="GoTo">
+        <input type="number" name="number" min="1" placeholder="Ir para nº da pergunta" style="padding:10px;border-radius:8px;border:none;width:200px;text-align:center;" />
+        <button class="next-btn" type="submit">Buscar</button>
+    </form>
+    <br />
+
+    <div class="question">@Model.Text</div>
+
+    <form method="post" asp-action="Answer">
+        @for (int i = 0; i < Model.Options.Count; i++)
+        {
+            <button class="option-btn" type="submit" name="option" value="@i">
+                @Model.Options[i]
+            </button>
+        }
+    </form>
+
+</div>

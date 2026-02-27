@@ -1,0 +1,88 @@
+﻿<link rel="stylesheet" href="~/css/quiz.css" />
+@model CleverWeb.Features.Quizz.Question
+
+<div class="quiz-container">
+
+    <div class="scoreboard">
+        <span style="color:@(ViewBag.ScoreBlue == 1 ? "blue" : "red")">
+            @(ViewBag.ScoreBlue == 1 ? "CERTA RESPOSTA" : "RESPOSTA ERRADA")
+        </span>
+    </div>
+
+    <h3><strong>Pergunta:</strong> @Model.Text</h3>
+    <h1> 
+        @(ViewBag.ScoreBlue == 1 ? ViewBag.resposta : "")
+    </h1>
+    <h3><strong>Referência:</strong> @ViewBag.Reference</h3>
+
+   
+
+    <a class="next-btn" asp-action="Next">Próxima Pergunta</a>
+    <br /><br />
+    <a class="restart-btn" asp-action="Restart">Reiniciar</a>
+
+</div>
+<style>
+/* Container principal */
+.quiz-container {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+}
+
+/* Placar */
+.scoreboard {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Textos */
+.quiz-container p {
+    font-size: 18px;
+    margin: 10px 0;
+    color: #333;
+}
+
+/* Botões */
+.next-btn,
+.restart-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    margin-top: 15px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+/* Botão próxima pergunta */
+.next-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.next-btn:hover {
+    background-color: #43a047;
+    transform: translateY(-2px);
+}
+
+/* Botão reiniciar */
+.restart-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.restart-btn:hover {
+    background-color: #e53935;
+    transform: translateY(-2px);
+}
+
+/* Responsividade */
+
+</style >
