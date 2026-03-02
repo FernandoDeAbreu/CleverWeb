@@ -35,7 +35,8 @@ namespace CleverWeb.Features.Caixa.Services
 
         public RelatorioMovimentoCaixaViewModel ObterRelatorio(FiltroMovimentoCaixaViewModel filtro)
         {
-            var contribuicoesQuery = _context.Contribuicao.Where(c => c.CaixaID == filtro.CaixaId).Include(c => c.Membro)
+            var contribuicoesQuery = _context.Contribuicao.Where(c => c.CaixaID == filtro.CaixaId && c.MotivoExclusao == null)
+                                                .Include(c => c.Membro)
                                                 .Select(c => new
                                                 {
                                                     Id = c.Id,
@@ -71,7 +72,7 @@ namespace CleverWeb.Features.Caixa.Services
                                                   TipoContribuicao = m.TipoContribuicao,
                                                   Origem = m.Origem
                                               })
-                                              .OrderBy(m => m.Data).AsQueryable();
+                                              .OrderBy(m => m.Descricao).AsQueryable();
 
             if (filtro.TipoContribuicao.HasValue)
             {
