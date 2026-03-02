@@ -29,8 +29,6 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
           rm -rf /var/www/clever/publish/*
-          sudo mkdir -p /var/www/clever/publish
-          sudo chown -R www-data:www-data /var/www/clever
 
     - name: Deploy to Server
       uses: appleboy/scp-action@v0.1.7
