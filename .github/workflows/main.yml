@@ -19,7 +19,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Publish
-        run: dotnet publish -c Release -o publish
+        run: dotnet publish -c Release -o 
 
       - name: Clean remote app folder
         uses: appleboy/ssh-action@v1.0.3
