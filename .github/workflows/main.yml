@@ -19,7 +19,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Publish
-        run: dotnet publish -c Release -o 
+        run: dotnet publish -c Release -o app
 
       - name: Clean remote app folder
         uses: appleboy/ssh-action@v1.0.3
@@ -37,7 +37,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "publish/*"
-          target: "/var/www/clever/app"
+          target: "/var/www/clever"
 
       - name: Restart Service
         uses: appleboy/ssh-action@v1.0.3
