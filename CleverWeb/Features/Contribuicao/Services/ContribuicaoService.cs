@@ -23,7 +23,7 @@ namespace CleverWeb.Features.Contribuicao.Services
                  var query = _db.Contribuicao.Where(c => c.MotivoExclusao == null)
                                             .Include(c => c.Membro)
                                             .AsNoTracking()
-                                            .OrderByDescending(c => c.DataPagamento)
+                                            .OrderBy(c => c.Membro.Nome)
                                             .AsQueryable();
 
                    if (filtro.TipoContribuicao.HasValue)

@@ -49,7 +49,7 @@ namespace CleverWeb.Features.Home
             {
                 SaldoCaixaDizimo = dizimo.SaldoAtual,
                 SaldoCaixaOfertas = oferta.SaldoAtual,
-                SaldoCaixaMissao = missao.SaldoAtual,
+                SaldoCaixaMissao = 0,
                 Lista = ultimasAtividades.Lista.Take(10)
             };
 
