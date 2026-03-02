@@ -28,7 +28,7 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
-          sudo rm -rf /var/www/clever/publish/*
+          rm -rf /var/www/clever/publish/*
           sudo mkdir -p /var/www/clever/publish
           sudo chown -R www-data:www-data /var/www/clever
 
