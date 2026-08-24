@@ -63,78 +63,87 @@ namespace CleverWeb.Data.Reports
         {
             var totais = CalcularTotal();
             container.Table(table =>
+            {
+                table.ColumnsDefinition(columns =>
                 {
-                    table.ColumnsDefinition(columns =>
-                    {
-                        columns.RelativeColumn(1); // Data
-                        columns.RelativeColumn(5); // Descrição
-                        columns.RelativeColumn(1); // Valor
-                    });
-
-                    // Cabeçalho da tabela
-                    table.Header(header =>
-                    {
-                        header.Cell().Border(0.5f).Text("DATA").Bold().AlignCenter(); 
-                        header.Cell().Border(0.5f).Text("CONTRIBUINTE").Bold().AlignCenter(); 
-                        header.Cell().Border(0.5f).Text("ENTRADAS").Bold().AlignCenter(); 
-                    });
-
-                    // Linhas (exemplo)
-                    foreach (var item in _ralatorio.Lista)
-                    {
-                        if (item.Valor > 0)
-                        {
-                            table.Cell().Border(0.5f).Text($" {item.Data:dd/MM/yyyy}");
-                            table.Cell().Border(0.5f).Text($" {item.Origem}");
-                            table.Cell().Border(0.5f).Text($"{item.Valor.ToString("C", new CultureInfo("pt-BR"))}  ").AlignEnd();
-                        }
-                    }
-
-                    // Total entradas
-                    table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).Text($" ");
-
-                    table.Cell().ColumnSpan(3)
-                    .BorderLeft(0.5f)
-                    .BorderRight(0.5f)
-                    .Text($" Total de entradas  {totais.TotalEntradas.ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
-                    table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).BorderBottom(0.5f).Text($" ");
-
-                    table.Cell().ColumnSpan(3).Text($" ");
-                    table.Cell().ColumnSpan(3).Text($" ");
-
-                    // Despesas
-                    table.Cell().ColumnSpan(3).Border(0.5f).Text("DESPESAS E SAÍDAS").Bold().AlignCenter();
-
-                    // Linhas
-                    foreach (var item in _ralatorio.Lista)
-                    {
-                        if (item.Valor < 0)
-                        {
-                            table.Cell().ColumnSpan(2).Border(0.5f).Text($" {item.Descricao}");
-                            table.Cell().Border(0.5f).Text($"{item.Valor.ToString("C", new CultureInfo("pt-BR"))}  ").AlignEnd();
-                        }
-                    }
-                    // Total Despesas
-
-                    table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).Text($" ");
-
-                    table.Cell().ColumnSpan(3)
-                    .BorderLeft(0.5f)
-                    .BorderRight(0.5f)
-                    .Text($" Total de saídas  {_ralatorio.Lista.Where(m => m.Valor < 0).Sum(m => m.Valor).ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
-                    table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).BorderBottom(0.5f).Text($" ");
-
-                    table.Cell().ColumnSpan(3).Text($" ");
-                    table.Cell().ColumnSpan(3).Text($" ");
-                    table.Cell().ColumnSpan(3).Text($" ");
-                    table.Cell().ColumnSpan(3).Text($" ");
-
-                    table.Cell().ColumnSpan(3)
-                    .Text($" Saldo anterior:  {_ralatorio.Caixa.SaldoAnterior.ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
-                    table.Cell().ColumnSpan(3).Text($" ");
-                    table.Cell().ColumnSpan(3)
-                    .Text($" Saldo atual:   {_ralatorio.Caixa.SaldoAtual.ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
+                    columns.RelativeColumn(1); // Data
+                    columns.RelativeColumn(5); // Descrição
+                    columns.RelativeColumn(1); // Valor
                 });
+
+                // Cabeçalho da tabela
+                table.Header(header =>
+                {
+                    header.Cell().Border(0.5f).Text("DATA").Bold().AlignCenter();
+                    header.Cell().Border(0.5f).Text("CONTRIBUINTE").Bold().AlignCenter();
+                    header.Cell().Border(0.5f).Text("ENTRADAS").Bold().AlignCenter();
+                });
+
+                // Linhas (exemplo)
+                foreach (var item in _ralatorio.Lista)
+                {
+                    if (item.Valor > 0)
+                    {
+                        table.Cell().Border(0.5f).Text($" {item.Data:dd/MM/yyyy}");
+                        table.Cell().Border(0.5f).Text($" {item.Origem}");
+                        table.Cell().Border(0.5f).Text($"{item.Valor.ToString("C", new CultureInfo("pt-BR"))}  ").AlignEnd();
+                    }
+                }
+
+                // Total entradas
+                table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).Text($" ");
+
+                table.Cell().ColumnSpan(3)
+                .BorderLeft(0.5f)
+                .BorderRight(0.5f)
+                .Text($" Total de entradas  {totais.TotalEntradas.ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
+                table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).BorderBottom(0.5f).Text($" ");
+
+                table.Cell().ColumnSpan(3).Text($" ");
+                table.Cell().ColumnSpan(3).Text($" ");
+
+                // Despesas
+                table.Cell().ColumnSpan(3).Border(0.5f).Text("DESPESAS E SAÍDAS").Bold().AlignCenter();
+
+                // Linhas
+                foreach (var item in _ralatorio.Lista)
+                {
+                    if (item.Valor < 0)
+                    {
+                        table.Cell().ColumnSpan(2).Border(0.5f).Text($" {item.Descricao}");
+                        table.Cell().Border(0.5f).Text($"{item.Valor.ToString("C", new CultureInfo("pt-BR"))}  ").AlignEnd();
+                    }
+                }
+                // Total Despesas
+
+                table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).Text($" ");
+
+                table.Cell().ColumnSpan(3)
+                .BorderLeft(0.5f)
+                .BorderRight(0.5f)
+                .Text($" Total de saídas  {_ralatorio.Lista.Where(m => m.Valor < 0).Sum(m => m.Valor).ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
+                table.Cell().ColumnSpan(3).BorderLeft(0.5f).BorderRight(0.5f).BorderBottom(0.5f).Text($" ");
+
+                table.Cell().ColumnSpan(3).Text($" ");
+                table.Cell().ColumnSpan(3).Text($" ");
+                table.Cell().ColumnSpan(3).Text($" ");
+                table.Cell().ColumnSpan(3).Text($" ");
+
+                if (_ralatorio.Filtro.TipoContribuicao != Shared.Enums.TipoContribuicao.Missão)
+                {
+                    SaldoCaixa(table);
+                }
+
+            });
+        }
+
+        private void SaldoCaixa(TableDescriptor table)
+        {
+            table.Cell().ColumnSpan(3)
+            .Text($" Saldo anterior:  {_ralatorio.Caixa.SaldoAnterior.ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
+            table.Cell().ColumnSpan(3).Text($" ");
+            table.Cell().ColumnSpan(3)
+            .Text($" Saldo atual:   {_ralatorio.Caixa.SaldoAtual.ToString("C", new CultureInfo("pt-BR"))}").Bold().AlignRight();
         }
 
         private static void ComposeFooter(IContainer container)
