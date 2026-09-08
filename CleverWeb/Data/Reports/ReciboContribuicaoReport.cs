@@ -6,9 +6,16 @@ using QuestPDF.Infrastructure;
 
 namespace CleverWeb.Data.Reports
 {
-    public class ReciboContribuicaoReport(Contribuicao contribuicao) : IDocument
+    public class ReciboContribuicaoReport : IDocument
     {
-        private readonly Contribuicao _contribuicao = contribuicao;
+        private readonly Contribuicao _contribuicao;
+        private readonly string _tenantName;
+
+        public ReciboContribuicaoReport(Contribuicao contribuicao, string tenantName)
+        {
+            _contribuicao = contribuicao;
+            _tenantName = tenantName;
+        }
 
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
 
@@ -40,7 +47,7 @@ namespace CleverWeb.Data.Reports
                   .BorderLeft(0.5f).Text($"{_contribuicao.Id}").FontSize(12).Italic().AlignRight();
                 col.Item()
                  .BorderRight(0.5f)
-                 .BorderLeft(0.5f).Text(" Congregação: IEADA SHEKINAH ").FontSize(12);
+                 .BorderLeft(0.5f).Text($" Congregação: {_tenantName} ").FontSize(12);
                 col.Item()
                  .BorderRight(0.5f)
                  .BorderLeft(0.5f).Text(" Endereço: Rua Goias 1634 - Centro - Açailândia-MA").FontSize(12);

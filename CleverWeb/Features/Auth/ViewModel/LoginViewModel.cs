@@ -4,6 +4,9 @@ namespace CleverWeb.Features.Auth.ViewModel
 {
     public class LoginViewModel
     {
+        [Display(Name = "Empresa")]
+        public int? TenantId { get; set; }
+
         [Required]
         [Display(Name = "Usuário")]
         public string UserName { get; set; } = null!;
@@ -11,6 +14,5 @@ namespace CleverWeb.Features.Auth.ViewModel
         [Required]
         [DataType(DataType.Password)]
         public string Senha { get; set; } = null!;
-
     }
 }

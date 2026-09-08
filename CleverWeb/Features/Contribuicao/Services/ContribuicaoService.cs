@@ -2,6 +2,7 @@
 using CleverWeb.Data;
 using CleverWeb.Data.Reports;
 using CleverWeb.Features.Contribuicao.ViewModels;
+using CleverWeb.Infrastructure.Tenant;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
 
@@ -11,16 +12,19 @@ namespace CleverWeb.Features.Contribuicao.Services
     {
         private readonly CleverDbContext _db;
         private readonly IMapper _mapper;
+        private readonly ITenantAccessor _tenantAccessor;
 
-        public ContribuicaoService(CleverDbContext db, IMapper mapper)
+        public ContribuicaoService(CleverDbContext db, IMapper mapper, ITenantAccessor tenantAccessor)
         {
             _db = db;
             _mapper = mapper;
+            _tenantAccessor = tenantAccessor;
         }
 
         public RelatorioContribuicaoViewModel ObterRelatorio(FiltroContribuicaoViewModel filtro)
         {
-                 var query = _db.Contribuicao.Where(c => c.MotivoExclusao == null)
+                 var tenantId = _db.QueryByTenant(_db.Contribuicao).Select(c => c.TenantId).FirstOrDefault();
+                 var query = _db.Contribuicao.Where(c => c.MotivoExclusao == null && c.TenantId == tenantId)
                                             .Include(c => c.Membro)
                                             .AsNoTracking()
                                             .OrderBy(c => c.Membro.Nome)
@@ -46,17 +50,21 @@ namespace CleverWeb.Features.Contribuicao.Services
 
         public async Task<byte[]> ImprimirComprovante(int id)
         {
-            var contribuicao = await _db.Contribuicao.Where(c => c.MotivoExclusao == null)
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var contribuicao = await _db.Contribuicao.Where(c => c.MotivoExclusao == null && c.TenantId == tenantId)
                 .Include(c => c.Membro)
                 .FirstAsync(c => c.Id == id);
 
-            var document = new ReciboContribuicaoReport(contribuicao);
+            var tenantName = _db.Tenant.FirstOrDefault(t => t.Id == tenantId)?.Nome ?? "Tenant";
+            var document = new ReciboContribuicaoReport(contribuicao, tenantName);
             return document.GeneratePdf();
         }
 
         public byte[] ExportarPdf(RelatorioContribuicaoViewModel relatorioContribuicao)
         {
-            var document = new RelatorioTemploCentral(relatorioContribuicao);
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var tenantName = _db.Tenant.FirstOrDefault(t => t.Id == tenantId)?.Nome ?? "Tenant";
+            var document = new RelatorioTemploCentral(relatorioContribuicao, tenantName);
 
             var pdfBytes = document.GeneratePdf();
 

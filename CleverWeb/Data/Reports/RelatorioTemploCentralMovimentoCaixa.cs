@@ -7,9 +7,16 @@ using System.Globalization;
 
 namespace CleverWeb.Data.Reports
 {
-    public class RelatorioTemploCentralMovimentoCaixa(RelatorioMovimentoCaixaViewModel ralatorio) : IDocument
+    public class RelatorioTemploCentralMovimentoCaixa : IDocument
     {
-        private readonly RelatorioMovimentoCaixaViewModel _ralatorio = ralatorio;
+        private readonly RelatorioMovimentoCaixaViewModel _ralatorio;
+        private readonly string _tenantName;
+
+        public RelatorioTemploCentralMovimentoCaixa(RelatorioMovimentoCaixaViewModel ralatorio, string tenantName)
+        {
+            _ralatorio = ralatorio;
+            _tenantName = tenantName;
+        }
 
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
 
@@ -50,7 +57,7 @@ namespace CleverWeb.Data.Reports
                      .Text($" Movimento do caixa de {_ralatorio.Filtro.TipoContribuicao} no período {_ralatorio.Caixa.DtInicial:dd/MM/yyyy} à {_ralatorio.Caixa.DtFinal:dd/MM/yyyy} ").FontSize(12).Bold().ParagraphSpacing(10);
                     col.Item()
                      .BorderRight(0.5f)
-                     .BorderLeft(0.5f).Text(" Congregação: IEADA SHEKINAH | Endereço: Rua Goias - Centro - Açailândia-MA").FontSize(12);
+                     .BorderLeft(0.5f).Text($" Congregação: {_tenantName} | Endereço: Rua Goias - Centro - Açailândia-MA").FontSize(12);
                     col.Item()
                      .BorderRight(0.5f)
                      .BorderLeft(0.5f)

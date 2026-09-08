@@ -26,7 +26,10 @@ namespace CleverWeb.Features.Despesa
 
         public async Task<IActionResult> Index()
         {
-            var Despesa = await _db.Despesa.Where(c => c.MotivoExclusao == null)
+            var tenantId = HttpContext.User.FindFirst("tenant_id")?.Value;
+            var tenantFilter = string.IsNullOrWhiteSpace(tenantId) ? 0 : int.Parse(tenantId);
+
+            var Despesa = await _db.Despesa.Where(c => c.MotivoExclusao == null && c.TenantId == tenantFilter)
                 .Include(c => c.Fornecedor)
                 .AsNoTracking()
                 .OrderByDescending(m => m.DataPagamento).Take(20)

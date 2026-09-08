@@ -6,6 +6,7 @@ using CleverWeb.Features.Despesa.Services;
 using CleverWeb.Features.Membro.Validators;
 using CleverWeb.Features.Users.Services;
 using CleverWeb.Infrastructure.ViewLocation;
+using CleverWeb.Models;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -18,6 +19,9 @@ cultureInfo.NumberFormat.CurrencySymbol = "R$";
 
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CleverWeb.Infrastructure.Tenant.ITenantAccessor, CleverWeb.Infrastructure.Tenant.TenantAccessor>();
 
 builder.Services.AddDbContext<CleverDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -65,6 +69,40 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CleverDbContext>();
     db.Database.Migrate();
+
+    if (!db.Tenant.Any())
+    {
+        var tenantPadrao = new Tenant
+        {
+            Nome = "Tenant Padrão",
+            Slug = "default",
+            Ativo = true,
+            DataCriacao = DateTime.UtcNow
+        };
+
+        db.Tenant.Add(tenantPadrao);
+        db.SaveChanges();
+    }
+
+    var tenantAtual = db.Tenant.First();
+
+    foreach (var usuario in db.Usuario.Where(u => u.TenantId == 0).ToList())
+    {
+        usuario.TenantId = tenantAtual.Id;
+    }
+
+    if (!db.Usuario.Any())
+    {
+        db.Usuario.Add(new Usuario
+        {
+            TenantId = tenantAtual.Id,
+            UserName = "admin",
+            PasswordHash = AuthService.HashSenha("admin123"),
+            Ativo = true
+        });
+    }
+
+    db.SaveChanges();
 }
 
 app.UseHttpsRedirection();

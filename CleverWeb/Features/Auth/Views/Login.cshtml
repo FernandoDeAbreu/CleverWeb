@@ -11,6 +11,13 @@
 
             <form method="post" class="needs-validation" novalidate>
                 <div class="form-floating mb-3">
+                    <select asp-for="TenantId" asp-items="ViewBag.Tenants" class="form-select rounded-3" required>
+                        <option value="">Selecione a empresa</option>
+                    </select>
+                    <label asp-for="TenantId"></label>
+                </div>
+
+                <div class="form-floating mb-3">
                     <input asp-for="UserName" class="form-control rounded-3" placeholder="Usuário" required />
                     <label asp-for="UserName"></label>
                 </div>

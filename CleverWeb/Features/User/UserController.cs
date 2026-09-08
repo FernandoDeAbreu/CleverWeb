@@ -27,11 +27,12 @@ namespace CleverWeb.Features.Users
 
             if (_userService.UsuarioExiste(model.UserName))
             {
-                ModelState.AddModelError("", "Usuário já existe");
+                ModelState.AddModelError("", "Usuário já existe neste tenant");
                 return View(model);
             }
 
-            _userService.CriarUsuario(model.UserName, model.Senha);
+            var tenantId = HttpContext.User.FindFirst("tenant_id")?.Value;
+            _userService.CriarUsuario(model.UserName, model.Senha, string.IsNullOrWhiteSpace(tenantId) ? null : int.Parse(tenantId));
 
             return RedirectToAction("Login", "Auth");
         }

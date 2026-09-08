@@ -1,0 +1,43 @@
+@model IEnumerable<CleverWeb.Models.Tenant>
+
+<h2>Igrejas</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nova igreja</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Slug</th>
+            <th>Ativo</th>
+            <th>Data criação</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tenant in Model)
+        {
+            <tr>
+                <td>@tenant.Nome</td>
+                <td>@tenant.Slug</td>
+                <td>@(tenant.Ativo ? "Sim" : "Não")</td>
+                <td>@tenant.DataCriacao.ToString("dd/MM/yyyy")</td>
+                <td class="text-end">
+                    <a asp-action="Edit" asp-route-id="@tenant.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <form asp-action="ToggleStatus" asp-route-id="@tenant.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm @(tenant.Ativo ? "btn-secondary" : "btn-success")">
+                            @(tenant.Ativo ? "Desativar" : "Ativar")
+                        </button>
+                    </form>
+                    <form asp-action="Delete" asp-route-id="@tenant.Id" method="post" class="d-inline" onsubmit="return confirm('Deseja realmente excluir esta igreja?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
