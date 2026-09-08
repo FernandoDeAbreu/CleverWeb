@@ -91,14 +91,33 @@ using (var scope = app.Services.CreateScope())
         usuario.TenantId = tenantAtual.Id;
     }
 
+    if (!db.Membro.Any(m => m.TenantId == tenantAtual.Id))
+    {
+        db.Membro.Add(new Membro
+        {
+            TenantId = tenantAtual.Id,
+            Nome = "Administrador",
+            Email = "admin@empresa.local",
+            Telefone = "(00) 00000-0000",
+            DataNascimento = DateTime.UtcNow.AddYears(-30),
+            DataCadastro = DateTime.UtcNow
+        });
+    }
+
+    db.SaveChanges();
+
+    var membroPadrao = db.Membro.FirstOrDefault(m => m.TenantId == tenantAtual.Id);
+
     if (!db.Usuario.Any())
     {
         db.Usuario.Add(new Usuario
         {
             TenantId = tenantAtual.Id,
+            MembroId = membroPadrao?.Id ?? 0,
             UserName = "admin",
             PasswordHash = AuthService.HashSenha("admin123"),
-            Ativo = true
+            Ativo = true,
+            IsGlobalAdmin = true
         });
     }
 

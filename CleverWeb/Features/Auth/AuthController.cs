@@ -21,32 +21,18 @@ namespace CleverWeb.Features.Auth
         [HttpGet("/login")]
         public IActionResult Login()
         {
-            ViewBag.Tenants = _authService.ObterTenantsAtivos()
-                .Select(t => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
-                {
-                    Value = t.Id.ToString(),
-                    Text = t.Nome
-                }).ToList();
-
-            return View(new LoginViewModel { TenantId = _authService.ObterTenantsAtivos().FirstOrDefault()?.Id });
+            return View(new LoginViewModel());
         }
 
         [HttpPost("/login")]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            ViewBag.Tenants = _authService.ObterTenantsAtivos()
-                .Select(t => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
-                {
-                    Value = t.Id.ToString(),
-                    Text = t.Nome
-                }).ToList();
-
             if (!ModelState.IsValid) return View(model);
 
-            var usuario = _authService.Autenticar(model.UserName, model.Senha, model.TenantId);
+            var usuario = _authService.Autenticar(model.UserName, model.Senha);
             if (usuario == null)
             {
-                ModelState.AddModelError("", "Usuário, empresa ou senha inválidos");
+                ModelState.AddModelError("", "Usuário ou senha inválidos. Verifique suas credenciais e tente novamente.");
                 return View(model);
             }
 
@@ -55,11 +41,13 @@ namespace CleverWeb.Features.Auth
 
             var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, usuario.UserName),
+            new Claim(ClaimTypes.Name, usuario.Membro?.Nome ?? usuario.UserName),
+            new Claim("member_name", usuario.Membro?.Nome ?? usuario.UserName),
             new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
             new Claim("tenant_id", usuario.TenantId.ToString()),
             new Claim("tenant_slug", _authService.ObterSlugTenant(usuario.TenantId)),
-            new Claim("tenant_name", tenantNome)
+            new Claim("tenant_name", tenantNome),
+            new Claim("is_global_admin", usuario.IsGlobalAdmin ? "true" : "false")
         };
 
             var identity = new ClaimsIdentity(

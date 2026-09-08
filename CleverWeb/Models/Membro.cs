@@ -11,6 +11,7 @@
         public string Telefone { get; set; } = string.Empty;
         public DateTime DataCadastro { get; set; } = DateTime.UtcNow;
 
+        public ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
         public ICollection<Contribuicao> Contribuicoes { get; set; } = new List<Contribuicao>();
     }
 }

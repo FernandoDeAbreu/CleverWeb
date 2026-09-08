@@ -4,35 +4,34 @@
     ViewData["Title"] = "Login";
 }
 
-<div class="d-flex align-items-center justify-content-center vh-100 bg-body-tertiary">
-    <div class="card border-0 shadow-lg w-100 mx-3" style="max-width: 380px;">
-        <div class="card-body p-4">
-            <h3 class="text-center fw-bold mb-4 text-primary">Acesso ao Sistema</h3>
+<div class="auth-shell">
+    <div class="auth-card">
+        <div class="auth-card__header">
+            <div class="brand-badge">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <h1>Acesso ao Sistema</h1>
+            <p>Entre com seu usuário e senha da igreja.</p>
+        </div>
 
-            <form method="post" class="needs-validation" novalidate>
+        <div class="auth-card__body">
+            <form method="post" class="auth-form needs-validation" novalidate>
                 <div class="form-floating mb-3">
-                    <select asp-for="TenantId" asp-items="ViewBag.Tenants" class="form-select rounded-3" required>
-                        <option value="">Selecione a empresa</option>
-                    </select>
-                    <label asp-for="TenantId"></label>
-                </div>
-
-                <div class="form-floating mb-3">
-                    <input asp-for="UserName" class="form-control rounded-3" placeholder="Usuário" required />
+                    <input asp-for="UserName" class="form-control" placeholder="Usuário" autocomplete="username" required />
                     <label asp-for="UserName"></label>
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input asp-for="Senha" type="password" class="form-control rounded-3" placeholder="Senha" required />
+                    <input asp-for="Senha" type="password" class="form-control" placeholder="Senha" autocomplete="current-password" required />
                     <label asp-for="Senha"></label>
                 </div>
 
-                <button class="btn btn-primary w-100 rounded-3 py-2 fw-semibold">
+                <button class="btn btn-primary w-100">
                     <i class="bi bi-box-arrow-in-right me-1"></i> Entrar
                 </button>
             </form>
 
-            <div asp-validation-summary="ModelOnly" class="text-danger mt-3 text-center"></div>
+            <div asp-validation-summary="ModelOnly" class="auth-alert"></div>
         </div>
     </div>
 </div>

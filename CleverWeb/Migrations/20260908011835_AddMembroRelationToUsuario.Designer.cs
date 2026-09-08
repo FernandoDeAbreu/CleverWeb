@@ -3,6 +3,7 @@ using System;
 using CleverWeb.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleverWeb.Migrations
 {
     [DbContext(typeof(CleverDbContext))]
-    partial class CleverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260908011835_AddMembroRelationToUsuario")]
+    partial class AddMembroRelationToUsuario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.22");
@@ -259,9 +262,7 @@ namespace CleverWeb.Migrations
 
                     b.HasIndex("MembroId");
 
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("UserName")
+                    b.HasIndex("TenantId", "UserName")
                         .IsUnique();
 
                     b.ToTable("Usuario");

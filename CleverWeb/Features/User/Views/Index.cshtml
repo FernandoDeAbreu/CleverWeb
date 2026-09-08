@@ -1,0 +1,54 @@
+@model IEnumerable<CleverWeb.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Usuários";
+}
+
+<div class="page-shell">
+    <div class="section-header">
+        <h1 class="page-title">Usuários</h1>
+        <div class="toolbar">
+            <a asp-action="Register" class="btn btn-primary">
+                <i class="bi bi-person-plus-fill me-1"></i> Novo usuário
+            </a>
+        </div>
+    </div>
+
+    <div class="card-panel">
+        <div class="table-responsive">
+            <table class="table data-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Status</th>
+                        <th>Admin Global</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var usuario in Model)
+                    {
+                        <tr>
+                            <td>@usuario.UserName</td>
+                            <td>
+                                <span class="status-pill @(usuario.Ativo ? "" : "inactive")">
+                                    @(usuario.Ativo ? "Ativo" : "Inativo")
+                                </span>
+                            </td>
+                            <td>@(usuario.IsGlobalAdmin ? "Sim" : "Não")</td>
+                            <td>
+                                <div class="table-actions">
+                                    <a asp-action="Edit" asp-route-id="@usuario.Id" class="btn btn-sm btn-warning">Editar</a>
+                                    <form asp-action="Delete" asp-route-id="@usuario.Id" method="post" class="d-inline" onsubmit="return confirm('Deseja realmente excluir este usuário?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

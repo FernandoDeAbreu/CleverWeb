@@ -1,6 +1,7 @@
 ﻿using CleverWeb.Data;
 using CleverWeb.Models;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 
 namespace CleverWeb.Features.Auth.Services
@@ -16,12 +17,10 @@ namespace CleverWeb.Features.Auth.Services
 
         public Usuario? Autenticar(string username, string senha, int? tenantId = null)
         {
-            var query = _db.Usuario.AsQueryable();
+            var user = _db.Usuario
+                .Include(u => u.Membro)
+                .FirstOrDefault(u => u.UserName == username && u.Ativo);
 
-            if (tenantId.HasValue)
-                query = query.Where(u => u.TenantId == tenantId.Value);
-
-            var user = query.FirstOrDefault(u => u.UserName == username && u.Ativo);
             if (user == null) return null;
 
             var verificarSenha = VerificarSenha(senha, user.PasswordHash) ? user : null;

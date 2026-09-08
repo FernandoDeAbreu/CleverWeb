@@ -15,9 +15,17 @@ namespace CleverWeb.Features.Tenant
             _db = db;
         }
 
+        private bool EhAdminGlobal()
+        {
+            return User.HasClaim("is_global_admin", "true");
+        }
+
         [HttpGet]
         public IActionResult Index()
         {
+            if (!EhAdminGlobal())
+                return Forbid();
+
             var tenants = _db.Tenant.OrderBy(x => x.Nome).ToList();
             return View(tenants);
         }
@@ -25,6 +33,9 @@ namespace CleverWeb.Features.Tenant
         [HttpGet]
         public IActionResult Create()
         {
+            if (!EhAdminGlobal())
+                return Forbid();
+
             return View(new TenantViewModel());
         }
 
@@ -32,6 +43,9 @@ namespace CleverWeb.Features.Tenant
         [ValidateAntiForgeryToken]
         public IActionResult Create(TenantViewModel model)
         {
+            if (!EhAdminGlobal())
+                return Forbid();
+
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -62,6 +76,9 @@ namespace CleverWeb.Features.Tenant
         [HttpGet]
         public IActionResult Edit(int id)
         {
+            if (!EhAdminGlobal())
+                return Forbid();
+
             var tenant = _db.Tenant.FirstOrDefault(x => x.Id == id);
             if (tenant == null)
                 return NotFound();
@@ -78,6 +95,9 @@ namespace CleverWeb.Features.Tenant
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, TenantViewModel model)
         {
+            if (!EhAdminGlobal())
+                return Forbid();
+
             if (!ModelState.IsValid)
                 return View(model);
 
@@ -105,6 +125,9 @@ namespace CleverWeb.Features.Tenant
         [ValidateAntiForgeryToken]
         public IActionResult ToggleStatus(int id)
         {
+            if (!EhAdminGlobal())
+                return Forbid();
+
             var tenant = _db.Tenant.FirstOrDefault(x => x.Id == id);
             if (tenant == null)
                 return NotFound();
@@ -120,6 +143,9 @@ namespace CleverWeb.Features.Tenant
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
+            if (!EhAdminGlobal())
+                return Forbid();
+
             var tenant = _db.Tenant.FirstOrDefault(x => x.Id == id);
             if (tenant == null)
                 return NotFound();

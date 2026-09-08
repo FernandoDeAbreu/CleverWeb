@@ -62,7 +62,11 @@ namespace CleverWeb.Data
                  .WithMany(x => x.Usuarios)
                  .HasForeignKey(x => x.TenantId)
                  .OnDelete(DeleteBehavior.Restrict);
-                b.HasIndex(x => new { x.TenantId, x.UserName }).IsUnique();
+                b.HasOne(x => x.Membro)
+                 .WithMany(x => x.Usuarios)
+                 .HasForeignKey(x => x.MembroId)
+                 .OnDelete(DeleteBehavior.Restrict);
+                b.HasIndex(x => x.UserName).IsUnique();
             });
 
             modelBuilder.Entity<Membro>(b =>

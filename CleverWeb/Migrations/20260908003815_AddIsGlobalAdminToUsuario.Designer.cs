@@ -3,6 +3,7 @@ using System;
 using CleverWeb.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleverWeb.Migrations
 {
     [DbContext(typeof(CleverDbContext))]
-    partial class CleverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260908003815_AddIsGlobalAdminToUsuario")]
+    partial class AddIsGlobalAdminToUsuario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.22");
@@ -241,9 +244,6 @@ namespace CleverWeb.Migrations
                     b.Property<bool>("IsGlobalAdmin")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("MembroId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -257,11 +257,7 @@ namespace CleverWeb.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MembroId");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("UserName")
+                    b.HasIndex("TenantId", "UserName")
                         .IsUnique();
 
                     b.ToTable("Usuario");
@@ -340,19 +336,11 @@ namespace CleverWeb.Migrations
 
             modelBuilder.Entity("CleverWeb.Models.Usuario", b =>
                 {
-                    b.HasOne("CleverWeb.Models.Membro", "Membro")
-                        .WithMany("Usuarios")
-                        .HasForeignKey("MembroId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("CleverWeb.Models.Tenant", "Tenant")
                         .WithMany("Usuarios")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Membro");
 
                     b.Navigation("Tenant");
                 });
@@ -365,8 +353,6 @@ namespace CleverWeb.Migrations
             modelBuilder.Entity("CleverWeb.Models.Membro", b =>
                 {
                     b.Navigation("Contribuicoes");
-
-                    b.Navigation("Usuarios");
                 });
 
             modelBuilder.Entity("CleverWeb.Models.Tenant", b =>
