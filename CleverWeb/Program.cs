@@ -12,8 +12,14 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(
+        new DirectoryInfo("/var/lib/cleverweb/keys"))
+    .SetApplicationName("CleverWeb");
 var cultureInfo = new CultureInfo("pt-BR");
 cultureInfo.NumberFormat.CurrencySymbol = "R$";
 
@@ -123,7 +129,11 @@ using (var scope = app.Services.CreateScope())
 
     db.SaveChanges();
 }
-
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                       ForwardedHeaders.XForwardedProto
+});
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseSession();
