@@ -5,81 +5,130 @@
 
 @{
     ViewData["Title"] = "Contribuições";
-    var filtro = ViewBag.Filtro as FiltroContribuicaoViewModel;
 }
 
-<h2 class="mb-3">
-    <i class="bi bi-clipboard-data"></i> Relatório de Contribuições
-</h2>
 
 
-<div class="mb-0">
-    <form method="get" class="mb-4">
-        <div class="row g-2 mb-2">
-            <div class="col-md-2">
-                <select asp-for="Filtro.TipoContribuicao"
-                        asp-items="Html.GetEnumSelectList<TipoContribuicao>()"
-                        class="form-select">
-                    <option value="">Todos</option>
-                </select>
-            </div>
+<div class="container py-4">
 
-            <div class="col-md-3">
-                <input asp-for="Filtro.DataInicio" type="date" class="form-control" />
-            </div>
+    <!-- Título -->
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-clipboard-data fs-3 text-primary me-2"></i>
+        <h2 class="mb-0 fw-bold">Relatório de Contribuições</h2>
+    </div>
 
-            <div class="col-md-3">
-                <input asp-for="Filtro.DataFim" type="date" class="form-control" />
-            </div>
+    <!-- Card Filtro -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get">
+                <div class="row g-3 align-items-end">
 
-            <div class="col-md-2 d-grid">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-funnel"></i> Filtrar
-                </button>
-            </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Tipo</label>
+                        <select asp-for="Filtro.TipoContribuicao"
+                                asp-items="Html.GetEnumSelectList<TipoContribuicao>()"
+                                class="form-select">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
 
-            <div class="col-md-2 d-grid">
-                <button formaction="@Url.Action("ExportarPdf")"
-                        formmethod="get"
-                        class="btn btn-danger">
-                    <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-                </button>
-            </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Data Inicial</label>
+                        <input asp-for="Filtro.DataInicio" type="date" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Data Final</label>
+                        <input asp-for="Filtro.DataFim" type="date" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-1"></i> Filtrar
+                        </button>
+
+                        <button formaction="@Url.Action("ExportarPdf")"
+                                formmethod="get"
+                                class="btn btn-danger w-100">
+                            <i class="bi bi-file-earmark-pdf me-1"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </form>
         </div>
-    </form>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">Nome</th>
-                <th scope="col">Contribuição</th>
-                <th scope="col">Forma de pagamento</th>
-                <th scope="col">Data de pagamento</th>
-                <th scope="col">Valor</th>
-            </tr>
-        </thead>
-        <tbody class="table-group-divider">
-            @foreach (var item in Model.Lista)
-            {
-                <tr>
-                    <th scope="row"></th>
-                    <td>@item.Membro?.Nome</td>
-                    <td>@item.TipoContribuicao</td>
-                    <td>@item.FormaPagto</td>
-                    <td>@item.DataPagamento.ToString("dd/MM/yyyy")</td>
-                    <td>@item.Valor.ToString("C", new CultureInfo("pt-BR"))</td>
-                </tr>
-            }
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="4" class="text-end"><strong>Total:</strong></td>
-                <td>
-                    @Model.Lista.Sum(x => x.Valor).ToString("C", new CultureInfo("pt-BR"))
-                </td>
-            </tr>
-        </tfoot>
+    </div>
 
-    </table>
+    <!-- Card Total -->
+    <div class="card shadow-sm border-0 mb-4 bg-light">
+        <div class="card-body d-flex align-items-center justify-content-between">
+
+            <div class="d-flex align-items-center">
+                <i class="bi bi-cash-coin fs-2 text-success me-3"></i>
+                <div>
+                    <div class="text-muted small">Total do Período</div>
+                    <div class="fs-4 fw-bold text-success">
+                        @Model.Lista.Sum(c => c.Valor).ToString("C", new CultureInfo("pt-BR"))
+                    </div>
+                </div>
+            </div>
+
+            <span>
+                @Model.Lista.Count() registro(s)
+            </span>
+
+        </div>
+    </div>
+
+    <!-- Lista -->
+    <div class="card shadow-sm border-0">
+        <div class="list-group list-group-flush">
+
+            @if (!Model.Lista.Any())
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                    Nenhuma contribuição encontrada.
+                </div>
+            }
+            else
+            {
+                @foreach (var item in Model.Lista)
+                {
+                    <div class="list-group-item py-3">
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <!-- Informações -->
+                            <div>
+                                <div class="fw-semibold text-dark">
+                                    @item.Membro.Nome
+                                </div>
+
+                                <div class="text-muted small">
+                                    @item.TipoContribuicao
+                                </div>
+
+                                <div class="text-muted small">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    @item.DataLancamanto.ToString("dd/MM/yyyy")
+                                </div>
+                            </div>
+
+                            <!-- Valor -->
+                            <div class="text-end">
+                                <div class="fw-bold text-success fs-5">
+                                    @item.Valor.ToString("C", new CultureInfo("pt-BR"))
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+            }
+
+        </div>
+    </div>
 
 </div>

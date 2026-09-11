@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CleverWeb.Data;
 using CleverWeb.Features.Membro.ViewModels;
+using CleverWeb.Infrastructure.Tenant;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +14,21 @@ namespace CleverWeb.Features.Membro
     {
         private readonly CleverDbContext _db;
         private readonly IMapper _mapper;
+        private readonly ITenantAccessor _tenantAccessor;
 
-        public MembroController(CleverDbContext db, IMapper mapper)
+        public MembroController(CleverDbContext db, IMapper mapper, ITenantAccessor tenantAccessor)
         {
             _db = db;
             _mapper = mapper;
+            _tenantAccessor = tenantAccessor;
         }
 
         public async Task<IActionResult> Index()
         {
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+
             var membros = await _db.Membro
+                .Where(m => m.TenantId == tenantId)
                 .AsNoTracking()
                 .OrderBy(m => m.Nome)
                 .ToListAsync();
@@ -33,7 +39,10 @@ namespace CleverWeb.Features.Membro
 
         public async Task<IActionResult> Details(int id)
         {
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+
             var membro = await _db.Membro
+                .Where(m => m.TenantId == tenantId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -57,6 +66,7 @@ namespace CleverWeb.Features.Membro
 
             var entidade = _mapper.Map<Models.Membro>(model);
             entidade.DataCadastro = DateTime.UtcNow;
+            entidade.TenantId = _tenantAccessor.CurrentTenantId ?? 0;
 
             _db.Membro.Add(entidade);
             await _db.SaveChangesAsync();

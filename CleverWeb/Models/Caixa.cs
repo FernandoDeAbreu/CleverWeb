@@ -5,6 +5,8 @@ namespace CleverWeb.Models
     public class Caixa
     {
         public int Id { get; set; }
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
         public DateTime DtInicial { get; set; }
         public DateTime DtFinal { get; set; }
         public DateTime DtFechamento { get; set; }

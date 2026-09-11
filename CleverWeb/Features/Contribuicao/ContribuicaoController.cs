@@ -3,6 +3,7 @@ using CleverWeb.Data;
 using CleverWeb.Features.Contribuicao.Services;
 using CleverWeb.Features.Contribuicao.ViewModels;
 using CleverWeb.Features.Membro.ViewModels;
+using CleverWeb.Infrastructure.Tenant;
 using CleverWeb.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +19,21 @@ namespace CleverWeb.Features.Contribuicao
         private readonly CleverDbContext _db;
         private readonly ContribuicaoService _contribuicaoService;
         private readonly IMapper _mapper;
+        private readonly ITenantAccessor _tenantAccessor;
 
-        public ContribuicaoController(ContribuicaoService contribuicaoService, CleverDbContext db, IMapper mapper)
+        public ContribuicaoController(ContribuicaoService contribuicaoService, CleverDbContext db, IMapper mapper, ITenantAccessor tenantAccessor)
         {
             _contribuicaoService = contribuicaoService;
             _db = db;
             _mapper = mapper;
+            _tenantAccessor = tenantAccessor;
         }
    
         public async Task<IActionResult> Index()
         {
-            var Contribuicao = await _db.Contribuicao.Where(c => c.MotivoExclusao == null)
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+
+            var Contribuicao = await _db.Contribuicao.Where(c => c.MotivoExclusao == null && c.TenantId == tenantId)
                  .Include(c => c.Membro)
                 .AsNoTracking()
                 .OrderByDescending(m => m.DataLancamanto).Take(20)
@@ -40,7 +45,10 @@ namespace CleverWeb.Features.Contribuicao
 
         public async Task<IActionResult> MembroList()
         {
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+
             var Membro = await _db.Membro
+                .Where(m => m.TenantId == tenantId)
                 .AsNoTracking()
                 .OrderBy(m => m.Nome)
                 .ToListAsync();
@@ -51,7 +59,8 @@ namespace CleverWeb.Features.Contribuicao
 
         public IActionResult Create(int id)
         {
-            var membro = _db.Membro.FirstOrDefault(m => m.Id == id);
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var membro = _db.Membro.FirstOrDefault(m => m.Id == id && m.TenantId == tenantId);
 
             ViewBag.Membro = membro?.Nome;
             ViewBag.MembroId = id;
@@ -67,6 +76,7 @@ namespace CleverWeb.Features.Contribuicao
 
             var contribuicao = new Models.Contribuicao
             {
+                TenantId = _tenantAccessor.CurrentTenantId ?? 0,
                 MembroId = membroId,
                 Valor = model.Valor,
                 DataLancamanto = DateTime.UtcNow,
@@ -83,7 +93,8 @@ namespace CleverWeb.Features.Contribuicao
 
         public IActionResult Details(int id)
         {
-            var contribuicao = _db.Contribuicao.Include(c => c.Membro).FirstOrDefault(m => m.Id == id);
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var contribuicao = _db.Contribuicao.Include(c => c.Membro).FirstOrDefault(m => m.Id == id && m.TenantId == tenantId);
             ViewBag.MembroId = contribuicao?.MembroId;
             ViewBag.Membro = contribuicao?.Membro.Nome;
             var vm = _mapper.Map<ContribuicaoViewModel>(contribuicao);
@@ -92,7 +103,8 @@ namespace CleverWeb.Features.Contribuicao
 
         public async Task<IActionResult> Edit(int id)
         {
-            var contribuicao = await _db.Contribuicao.FindAsync(id); 
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var contribuicao = await _db.Contribuicao.FirstOrDefaultAsync(c => c.Id == id && c.TenantId == tenantId); 
 
             if (contribuicao == null)
                 return NotFound();
@@ -113,7 +125,8 @@ namespace CleverWeb.Features.Contribuicao
             if (!ModelState.IsValid)
                 return View(model);
 
-            var entidade = await _db.Contribuicao.FindAsync(id);
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var entidade = await _db.Contribuicao.FirstOrDefaultAsync(c => c.Id == id && c.TenantId == tenantId);
            
             if (entidade == null)
                 return NotFound();
@@ -131,9 +144,10 @@ namespace CleverWeb.Features.Contribuicao
 
         public async Task<IActionResult> Comprovante(int id)
         {
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
             var contribuicao = await _db.Contribuicao
                 .Include(c => c.Membro)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync(c => c.Id == id && c.TenantId == tenantId);
 
             if (contribuicao == null)
                 return NotFound();

@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CleverWeb.Features.Users.ViewModels
 {
-    public class RegisterUserViewModel
+    public class EditUserViewModel
     {
+        public int Id { get; set; }
+
         [Required]
         [Display(Name = "Usuário")]
         public string UserName { get; set; } = string.Empty;
@@ -17,16 +19,20 @@ namespace CleverWeb.Features.Users.ViewModels
         [Display(Name = "Membro")]
         public int MembroId { get; set; }
 
-        [Required]
-        [DataType(DataType.Password)]
-        [Display(Name = "Senha")]
-        public string Senha { get; set; } = string.Empty;
+        [Display(Name = "Ativo")]
+        public bool Ativo { get; set; } = true;
 
-        [Required]
+        [Display(Name = "Admin Global")]
+        public bool IsGlobalAdmin { get; set; }
+
         [DataType(DataType.Password)]
-        [Compare("Senha", ErrorMessage = "As senhas não conferem")]
-        [Display(Name = "Confirmar Senha")]
-        public string ConfirmarSenha { get; set; } = string.Empty;
+        [Display(Name = "Nova senha")]
+        public string? NovaSenha { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirmar nova senha")]
+        [Compare("NovaSenha", ErrorMessage = "As senhas não conferem")]
+        public string? ConfirmarNovaSenha { get; set; }
 
         public List<SelectListItem> TenantOptions { get; set; } = new();
         public List<SelectListItem> MembroOptions { get; set; } = new();

@@ -1,0 +1,62 @@
+@model IEnumerable<CleverWeb.Models.Tenant>
+
+@{
+    ViewData["Title"] = "Igrejas";
+}
+
+<div class="page-shell">
+    <div class="section-header">
+        <h1 class="page-title">Igrejas</h1>
+        <div class="toolbar">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Nova igreja
+            </a>
+        </div>
+    </div>
+
+    <div class="card-panel">
+        <div class="table-responsive">
+            <table class="table data-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Slug</th>
+                        <th>Status</th>
+                        <th>Data criação</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tenant in Model)
+                    {
+                        <tr>
+                            <td>@tenant.Nome</td>
+                            <td>@tenant.Slug</td>
+                            <td>
+                                <span class="status-pill @(tenant.Ativo ? "" : "inactive")">
+                                    @(tenant.Ativo ? "Ativa" : "Inativa")
+                                </span>
+                            </td>
+                            <td>@tenant.DataCriacao.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <div class="table-actions">
+                                    <a asp-action="Edit" asp-route-id="@tenant.Id" class="btn btn-sm btn-warning">Editar</a>
+                                    <form asp-action="ToggleStatus" asp-route-id="@tenant.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm @(tenant.Ativo ? "btn-secondary" : "btn-success")">
+                                            @(tenant.Ativo ? "Desativar" : "Ativar")
+                                        </button>
+                                    </form>
+                                    <form asp-action="Delete" asp-route-id="@tenant.Id" method="post" class="d-inline" onsubmit="return confirm('Deseja realmente excluir esta igreja?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

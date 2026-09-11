@@ -26,15 +26,21 @@ namespace CleverWeb.Features.Home
 
         public async Task<IActionResult> Index()
         {
+            var tenantId = User.FindFirst("tenant_id")?.Value;
+            var tenantFilter = string.IsNullOrWhiteSpace(tenantId) ? 0 : int.Parse(tenantId);
+
             var dizimo = await _db.Caixa
+                  .Where(c => c.TenantId == tenantFilter)
                   .OrderByDescending(x => x.Id)
                   .FirstOrDefaultAsync(c => c.TipoContribuicao == TipoContribuicao.Dízimo) ?? new Models.Caixa();
 
             var oferta = await _db.Caixa
+                  .Where(c => c.TenantId == tenantFilter)
                   .OrderByDescending(x => x.Id)
                   .FirstOrDefaultAsync(c => c.TipoContribuicao == TipoContribuicao.Oferta) ?? new Models.Caixa(); 
 
             var missao = await _db.Caixa
+                  .Where(c => c.TenantId == tenantFilter)
                   .OrderByDescending(x => x.Id)
                   .FirstOrDefaultAsync(c => c.TipoContribuicao == TipoContribuicao.Missão) ?? new Models.Caixa(); 
 
@@ -49,7 +55,7 @@ namespace CleverWeb.Features.Home
             {
                 SaldoCaixaDizimo = dizimo.SaldoAtual,
                 SaldoCaixaOfertas = oferta.SaldoAtual,
-                SaldoCaixaMissao = missao.SaldoAtual,
+                SaldoCaixaMissao = 0,
                 Lista = ultimasAtividades.Lista.Take(10)
             };
 

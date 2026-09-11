@@ -1,0 +1,74 @@
+@model CleverWeb.Features.Users.ViewModels.EditUserViewModel
+
+@{
+    ViewData["Title"] = "Editar usuário";
+}
+
+<div class="page-shell">
+    <div class="form-card">
+        <h2>Editar usuário</h2>
+
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            @if (User.HasClaim("is_global_admin", "true"))
+            {
+                <div class="mb-3">
+                    <label asp-for="TenantId" class="form-label"></label>
+                    <select asp-for="TenantId" asp-items="Model.TenantOptions" class="form-select">
+                        <option value="">Selecione a igreja/tenant</option>
+                    </select>
+                    <span asp-validation-for="TenantId" class="text-danger"></span>
+                </div>
+            }
+
+            <div class="mb-3">
+                <label asp-for="MembroId" class="form-label"></label>
+                <select asp-for="MembroId" asp-items="Model.MembroOptions" class="form-select">
+                    <option value="">Selecione o membro</option>
+                </select>
+                <span asp-validation-for="MembroId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input asp-for="Ativo" class="form-check-input" />
+                <label asp-for="Ativo" class="form-check-label"></label>
+            </div>
+
+            @if (User.HasClaim("is_global_admin", "true") && ViewContext.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value != Model.Id.ToString())
+            {
+                <div class="mb-3 form-check">
+                    <input asp-for="IsGlobalAdmin" class="form-check-input" />
+                    <label asp-for="IsGlobalAdmin" class="form-check-label"></label>
+                </div>
+            }
+            else if (User.HasClaim("is_global_admin", "true"))
+            {
+                <div class="alert alert-warning">Você não pode remover o status de administrador global do seu próprio usuário.</div>
+            }
+
+            <div class="mb-3">
+                <label asp-for="NovaSenha" class="form-label"></label>
+                <input asp-for="NovaSenha" class="form-control" />
+                <span asp-validation-for="NovaSenha" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ConfirmarNovaSenha" class="form-label"></label>
+                <input asp-for="ConfirmarNovaSenha" class="form-control" />
+                <span asp-validation-for="ConfirmarNovaSenha" class="text-danger"></span>
+            </div>
+
+            <div class="form-actions">
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Salvar alterações</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,25 +1,57 @@
 ﻿@model CleverWeb.Features.Users.ViewModels.RegisterUserViewModel
 
-<h2>Cadastrar Usuário</h2>
+@{
+    ViewData["Title"] = "Cadastrar usuário";
+}
 
-<form asp-action="Register" method="post">
-    <div>
-        <label asp-for="UserName"></label>
-        <input asp-for="UserName" />
-        <span asp-validation-for="UserName"></span>
+<div class="page-shell">
+    <div class="form-card">
+        <h2>Cadastrar usuário</h2>
+
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            @if (User.HasClaim("is_global_admin", "true"))
+            {
+                <div class="mb-3">
+                    <label asp-for="TenantId" class="form-label"></label>
+                    <select asp-for="TenantId" asp-items="Model.TenantOptions" class="form-select">
+                        <option value="">Selecione a igreja/tenant</option>
+                    </select>
+                    <span asp-validation-for="TenantId" class="text-danger"></span>
+                </div>
+            }
+
+            <div class="mb-3">
+                <label asp-for="MembroId" class="form-label"></label>
+                <select asp-for="MembroId" asp-items="Model.MembroOptions" class="form-select">
+                    <option value="">Selecione o membro</option>
+                </select>
+                <span asp-validation-for="MembroId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Senha" class="form-label"></label>
+                <input asp-for="Senha" class="form-control" />
+                <span asp-validation-for="Senha" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ConfirmarSenha" class="form-label"></label>
+                <input asp-for="ConfirmarSenha" class="form-control" />
+                <span asp-validation-for="ConfirmarSenha" class="text-danger"></span>
+            </div>
+
+            <div class="form-actions">
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
+            </div>
+        </form>
     </div>
-
-    <div>
-        <label asp-for="Senha"></label>
-        <input asp-for="Senha" />
-        <span asp-validation-for="Senha"></span>
-    </div>
-
-    <div>
-        <label asp-for="ConfirmarSenha"></label>
-        <input asp-for="ConfirmarSenha" />
-        <span asp-validation-for="ConfirmarSenha"></span>
-    </div>
-
-    <button type="submit">Cadastrar</button>
-</form>
+</div>

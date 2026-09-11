@@ -11,6 +11,5 @@ namespace CleverWeb.Features.Auth.ViewModel
         [Required]
         [DataType(DataType.Password)]
         public string Senha { get; set; } = null!;
-
     }
 }
