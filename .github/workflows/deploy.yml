@@ -54,12 +54,15 @@ jobs:
 
           chmod 600 ~/.ssh/cleverweb_deploy
 
+          echo "Fingerprint da chave:"
+          ssh-keygen -lf ~/.ssh/cleverweb_deploy
+
           ssh-keyscan -p ${{ secrets.VPS_PORT }} \
             ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
       - name: Test SSH connection
         run: |
-          ssh \
+          ssh -vvv \
             -o BatchMode=yes \
             -o IdentitiesOnly=yes \
             -o PubkeyAuthentication=yes \
