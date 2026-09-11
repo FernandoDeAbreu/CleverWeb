@@ -34,19 +34,18 @@ jobs:
           chmod 600 ~/.ssh/cleverweb_deploy
           ssh-keyscan -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Test SSH connection
+       - name: Test SSH connection
         run: |
-          echo "Usuário configurado: ${{ secrets.VPS_USER }}"
-          echo "Porta configurada: ${{ secrets.VPS_PORT }}"
-          echo "Host configurado: ${{ secrets.VPS_HOST }}"
-
           ssh -vvv \
             -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o PubkeyAuthentication=yes \
+            -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no \
             -o StrictHostKeyChecking=yes \
             -i ~/.ssh/cleverweb_deploy \
             -p ${{ secrets.VPS_PORT }} \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "echo SSH_OK"s.VPS_USER }}@${{ secrets.VPS_HOST }} \
             "echo SSH_OK"
 
       - name: Deploy
