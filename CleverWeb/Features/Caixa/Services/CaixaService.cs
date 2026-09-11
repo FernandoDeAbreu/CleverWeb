@@ -3,6 +3,7 @@ using CleverWeb.Data;
 using CleverWeb.Data.Reports;
 using CleverWeb.Features.Caixa.ViewModels;
 using CleverWeb.Features.Contribuicao.ViewModels;
+using CleverWeb.Infrastructure.Tenant;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
 
@@ -12,11 +13,13 @@ namespace CleverWeb.Features.Caixa.Services
     {
         private readonly CleverDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ITenantAccessor _tenantAccessor;
 
-        public CaixaService(CleverDbContext context, IMapper mapper)
+        public CaixaService(CleverDbContext context, IMapper mapper, ITenantAccessor tenantAccessor)
         {
             _context = context;
             _mapper = mapper;
+            _tenantAccessor = tenantAccessor;
         }
 
         public RelatorioMovimentoCaixaViewModel ObterDados(int id)
@@ -35,7 +38,10 @@ namespace CleverWeb.Features.Caixa.Services
 
         public RelatorioMovimentoCaixaViewModel ObterRelatorio(FiltroMovimentoCaixaViewModel filtro)
         {
-            var contribuicoesQuery = _context.Contribuicao.Where(c => c.CaixaID == filtro.CaixaId).Include(c => c.Membro)
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+
+            var contribuicoesQuery = _context.Contribuicao.Where(c => c.CaixaID == filtro.CaixaId && c.MotivoExclusao == null && c.TenantId == tenantId)
+                                                .Include(c => c.Membro)
                                                 .Select(c => new
                                                 {
                                                     Id = c.Id,
@@ -47,7 +53,7 @@ namespace CleverWeb.Features.Caixa.Services
                                                     Origem = c.Membro.Nome,
                                                 });
 
-            var despesasQuery = _context.Despesa.Where(c => c.CaixaId == filtro.CaixaId).Include(d => d.Fornecedor)
+            var despesasQuery = _context.Despesa.Where(c => c.CaixaId == filtro.CaixaId && c.TenantId == tenantId).Include(d => d.Fornecedor)
                                                  .Select(d => new
                                                  {
                                                      Id = d.Id,
@@ -71,7 +77,7 @@ namespace CleverWeb.Features.Caixa.Services
                                                   TipoContribuicao = m.TipoContribuicao,
                                                   Origem = m.Origem
                                               })
-                                              .OrderBy(m => m.Data).AsQueryable();
+                                              .OrderBy(m => m.Descricao).AsQueryable();
 
             if (filtro.TipoContribuicao.HasValue)
             {
@@ -86,7 +92,7 @@ namespace CleverWeb.Features.Caixa.Services
                 movimentoCaixa = movimentoCaixa.Where(x => x.Data <= filtro.DataFim);
             }
 
-            var caixa = _context.Caixa.FirstOrDefault(c => c.Id == filtro.CaixaId);
+            var caixa = _context.Caixa.FirstOrDefault(c => c.Id == filtro.CaixaId && c.TenantId == tenantId);
 
             return new RelatorioMovimentoCaixaViewModel
             {
@@ -98,7 +104,8 @@ namespace CleverWeb.Features.Caixa.Services
 
         public async Task<List<ViewModels.CaixaViewModel>> HistoricoCaixa()
         {
-            var caixa = await _context.Caixa.OrderByDescending(c => c.DtFechamento).ToListAsync();
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var caixa = await _context.Caixa.Where(c => c.TenantId == tenantId).OrderByDescending(c => c.DtFechamento).ToListAsync();
 
             return _mapper.Map<List<CaixaViewModel>>(caixa);
         }
@@ -186,6 +193,7 @@ namespace CleverWeb.Features.Caixa.Services
 
             var depesa = new Models.Despesa
             {
+                TenantId = _tenantAccessor.CurrentTenantId ?? 0,
                 CaixaId = caixa.Id,
                 DataPagamento = DateTime.Now,
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Dízimo,
@@ -205,6 +213,7 @@ namespace CleverWeb.Features.Caixa.Services
 
             var depesa = new Models.Despesa
             {
+                TenantId = _tenantAccessor.CurrentTenantId ?? 0,
                 CaixaId = caixa.Id,
                 DataPagamento = DateTime.Now,
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Dízimo,
@@ -224,6 +233,7 @@ namespace CleverWeb.Features.Caixa.Services
 
             var depesa = new Models.Despesa
             {
+                TenantId = _tenantAccessor.CurrentTenantId ?? 0,
                 CaixaId = caixa.Id,
                 DataPagamento = DateTime.Now,
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Dízimo,
@@ -243,6 +253,7 @@ namespace CleverWeb.Features.Caixa.Services
 
             var depesa = new Models.Despesa
             {
+                TenantId = _tenantAccessor.CurrentTenantId ?? 0,
                 CaixaId = caixa.Id,
                 DataPagamento = DateTime.Now,
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Missão,
@@ -269,14 +280,16 @@ namespace CleverWeb.Features.Caixa.Services
 
         private async Task<Models.Caixa> CriarNovoCaixa(RelatorioMovimentoCaixaViewModel relatorio, Decimal saldoReceita)
         {
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
             var despesas = relatorio.Lista.Where(c => c.Tipo == "Saída").Sum(c => c.Valor) * -1;
 
-            var ultimoCaixa = await _context.Caixa.Where(c => c.TipoContribuicao == relatorio.Filtro.TipoContribuicao)
+            var ultimoCaixa = await _context.Caixa.Where(c => c.TipoContribuicao == relatorio.Filtro.TipoContribuicao && c.TenantId == tenantId)
                               .OrderByDescending(x => x.Id)
                               .FirstOrDefaultAsync() ?? new Models.Caixa();
 
             var caixa = new Models.Caixa
             {
+                TenantId = _tenantAccessor.CurrentTenantId ?? 0,
                 DtFechamento = DateTime.Now,
                 DtInicial = relatorio.Filtro.DataInicio ?? DateTime.Now,
                 DtFinal = relatorio.Filtro.DataFim ?? DateTime.Now,
@@ -295,7 +308,9 @@ namespace CleverWeb.Features.Caixa.Services
 
         public byte[] ExportarPdf(RelatorioMovimentoCaixaViewModel relatorioContribuicao)
         {
-            var document = new RelatorioTemploCentralMovimentoCaixa(relatorioContribuicao);
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var tenantName = _context.Tenant.FirstOrDefault(t => t.Id == tenantId)?.Nome ?? "Tenant";
+            var document = new RelatorioTemploCentralMovimentoCaixa(relatorioContribuicao, tenantName);
 
             var pdfBytes = document.GeneratePdf();
 

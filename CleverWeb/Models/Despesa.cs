@@ -5,6 +5,8 @@ namespace CleverWeb.Models
     public class Despesa
     {
         public int Id { get; set; }
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
 
         public string Descricao { get; set; } = string.Empty;
 
@@ -23,6 +25,5 @@ namespace CleverWeb.Models
         public string? MotivoExclusao { get; set; }
 
         public int CaixaId { get; set; }
-
     }
 }

@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="CleverWeb.Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include=".github\workflows\deploy.yml" />
   </ItemGroup>
 

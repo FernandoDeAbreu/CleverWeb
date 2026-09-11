@@ -38,6 +38,9 @@ namespace CleverWeb.Migrations
                     b.Property<decimal>("SaldoAtual")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("TipoContribuicao")
                         .HasColumnType("INTEGER");
 
@@ -45,6 +48,8 @@ namespace CleverWeb.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Caixa");
                 });
@@ -76,6 +81,9 @@ namespace CleverWeb.Migrations
                     b.Property<string>("MotivoExclusao")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("TipoContribuicao")
                         .HasColumnType("INTEGER");
 
@@ -85,6 +93,8 @@ namespace CleverWeb.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("MembroId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Contribuicao");
                 });
@@ -117,12 +127,17 @@ namespace CleverWeb.Migrations
                     b.Property<string>("MotivoExclusao")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("Valor")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("FornecedorId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Despesa");
                 });
@@ -137,7 +152,12 @@ namespace CleverWeb.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Fornecedor");
                 });
@@ -169,9 +189,44 @@ namespace CleverWeb.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("TenantId");
+
                     b.ToTable("Membro");
+                });
+
+            modelBuilder.Entity("CleverWeb.Models.Tenant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("Tenant");
                 });
 
             modelBuilder.Entity("CleverWeb.Models.Usuario", b =>
@@ -183,9 +238,18 @@ namespace CleverWeb.Migrations
                     b.Property<bool>("Ativo")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsGlobalAdmin")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MembroId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -193,7 +257,25 @@ namespace CleverWeb.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MembroId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
                     b.ToTable("Usuario");
+                });
+
+            modelBuilder.Entity("CleverWeb.Models.Caixa", b =>
+                {
+                    b.HasOne("CleverWeb.Models.Tenant", "Tenant")
+                        .WithMany("Caixas")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("CleverWeb.Models.Contribuicao", b =>
@@ -201,10 +283,18 @@ namespace CleverWeb.Migrations
                     b.HasOne("CleverWeb.Models.Membro", "Membro")
                         .WithMany("Contribuicoes")
                         .HasForeignKey("MembroId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CleverWeb.Models.Tenant", "Tenant")
+                        .WithMany("Contribuicoes")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Membro");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("CleverWeb.Models.Despesa", b =>
@@ -212,10 +302,59 @@ namespace CleverWeb.Migrations
                     b.HasOne("CleverWeb.Models.Fornecedor", "Fornecedor")
                         .WithMany("Despesas")
                         .HasForeignKey("FornecedorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CleverWeb.Models.Tenant", "Tenant")
+                        .WithMany("Despesas")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Fornecedor");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("CleverWeb.Models.Fornecedor", b =>
+                {
+                    b.HasOne("CleverWeb.Models.Tenant", "Tenant")
+                        .WithMany("Fornecedores")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("CleverWeb.Models.Membro", b =>
+                {
+                    b.HasOne("CleverWeb.Models.Tenant", "Tenant")
+                        .WithMany("Membros")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("CleverWeb.Models.Usuario", b =>
+                {
+                    b.HasOne("CleverWeb.Models.Membro", "Membro")
+                        .WithMany("Usuarios")
+                        .HasForeignKey("MembroId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CleverWeb.Models.Tenant", "Tenant")
+                        .WithMany("Usuarios")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Membro");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("CleverWeb.Models.Fornecedor", b =>
@@ -226,6 +365,23 @@ namespace CleverWeb.Migrations
             modelBuilder.Entity("CleverWeb.Models.Membro", b =>
                 {
                     b.Navigation("Contribuicoes");
+
+                    b.Navigation("Usuarios");
+                });
+
+            modelBuilder.Entity("CleverWeb.Models.Tenant", b =>
+                {
+                    b.Navigation("Caixas");
+
+                    b.Navigation("Contribuicoes");
+
+                    b.Navigation("Despesas");
+
+                    b.Navigation("Fornecedores");
+
+                    b.Navigation("Membros");
+
+                    b.Navigation("Usuarios");
                 });
 #pragma warning restore 612, 618
         }

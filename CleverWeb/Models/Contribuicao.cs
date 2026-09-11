@@ -5,6 +5,8 @@ namespace CleverWeb.Models
     public class Contribuicao
     {
         public int Id { get; set; }
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
         public int MembroId { get; set; }
         public Membro? Membro { get; set; }
         public decimal Valor { get; set; }
