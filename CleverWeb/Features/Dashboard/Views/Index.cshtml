@@ -4,20 +4,39 @@
 @{
     ViewData["Title"] = "Dashboard";
     var total = Model.SaldoCaixaDizimo + Model.SaldoCaixaOfertas + Model.SaldoCaixaMissao;
+    var chartLabels = System.Text.Json.JsonSerializer.Serialize(Model.Periodos);
+    var incomeData = System.Text.Json.JsonSerializer.Serialize(Model.EntradasPorPeriodo);
+    var expenseData = System.Text.Json.JsonSerializer.Serialize(Model.SaidasPorPeriodo);
+    var memberData = System.Text.Json.JsonSerializer.Serialize(Model.MembrosPorPeriodo);
 }
 
 <div class="dashboard-shell">
     <div class="dashboard-header">
-        <h1>Dashboard</h1>
+        <div>
+            <div class="section-header__eyebrow"><i class="bi bi-grid-1x2-fill"></i> Visão geral</div>
+            <h1>Dashboard</h1>
+            <p class="section-header__description">Acompanhe a saúde financeira e o crescimento da igreja.</p>
+        </div>
+        <span class="dashboard-date"><i class="bi bi-calendar3"></i> @DateTime.Today.ToString("dd 'de' MMMM", new System.Globalization.CultureInfo("pt-BR"))</span>
     </div>
 
 
     <div class="dashboard-summary">
-        <span class="dashboard-summary__label">Saldo total</span>
-        <strong class="dashboard-summary__value">@total.ToString("C")</strong>
+        <div>
+            <span class="dashboard-summary__label">Saldo total em caixa</span>
+            <strong class="dashboard-summary__value">@total.ToString("C")</strong>
+            <span class="dashboard-summary__hint"><i class="bi bi-graph-up-arrow"></i> Movimento dos últimos 7 dias</span>
+        </div>
+        <i class="bi bi-bar-chart-line-fill dashboard-summary__watermark"></i>
     </div>
 
     <div class="metric-grid">
+        <div class="metric-card metric-card--members">
+            <div class="metric-card__icon"><i class="bi bi-people-fill"></i></div>
+            <span class="metric-card__title">Membros cadastrados</span>
+            <span class="metric-card__value">@Model.TotalMembros</span>
+            <span class="metric-card__note"><i class="bi bi-person-plus"></i> @Model.NovosMembrosNoMes neste mês</span>
+        </div>
         <div class="metric-card metric-card--primary">
             <div class="metric-card__icon">
                 <i class="bi bi-piggy-bank-fill"></i>
@@ -43,12 +62,38 @@
         </div>
     </div>
 
+    <div class="dashboard-chart-grid">
+        <div class="panel chart-panel">
+            <div class="panel__header panel__header--split">
+                <div><h2>Movimentação financeira</h2><span>Entradas e saídas nos últimos 7 dias</span></div>
+                <i class="bi bi-bar-chart-line"></i>
+            </div>
+            <div class="chart-container"><canvas id="cashFlowChart"></canvas></div>
+            <div class="chart-totals">
+                <span><i class="bi bi-arrow-down-left"></i> Entradas <strong>@Model.EntradasUltimosSeteDias.ToString("C")</strong></span>
+                <span><i class="bi bi-arrow-up-right"></i> Saídas <strong>@Model.SaidasUltimosSeteDias.ToString("C")</strong></span>
+            </div>
+        </div>
+        <div class="panel chart-panel">
+            <div class="panel__header panel__header--split">
+                <div><h2>Novos membros</h2><span>Cadastros realizados nos últimos 7 dias</span></div>
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="chart-container"><canvas id="membersChart"></canvas></div>
+            <div class="chart-callout"><i class="bi bi-stars"></i><span><strong>@Model.NovosMembrosNoMes</strong> novos membros no mês atual</span></div>
+        </div>
+    </div>
+
     <div class="panel">
         <div class="panel__header">
             <h2>Últimas atividades</h2>
         </div>
         <div class="panel__body">
             <div class="list-group list-group-flush activity-list">
+                @if (!Model.Lista.Any())
+                {
+                    <div class="dashboard-empty"><i class="bi bi-inbox"></i>Nenhuma atividade recente.</div>
+                }
                 @foreach (var item in Model.Lista)
                 {
                     <a class="list-group-item list-group-item-action">
@@ -73,3 +118,16 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script>
+        const labels = @Html.Raw(chartLabels);
+        const incomeData = @Html.Raw(incomeData);
+        const expenseData = @Html.Raw(expenseData);
+        const memberData = @Html.Raw(memberData);
+        const chartOptions = { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: context => `${context.dataset.label}: ${Number(context.raw).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}` } } }, scales: { y: { beginAtZero: true, grid: { color: '#edf2f7' }, ticks: { color: '#94a3b8' } }, x: { grid: { display: false }, ticks: { color: '#64748b' } } } };
+        new Chart(document.getElementById('cashFlowChart'), { type: 'line', data: { labels, datasets: [{ label: 'Entradas', data: incomeData, borderColor: '#0d6efd', backgroundColor: 'rgba(13, 110, 253, 0.1)', fill: true, tension: 0.35, pointRadius: 3 }, { label: 'Saídas', data: expenseData, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.08)', fill: true, tension: 0.35, pointRadius: 3 }] }, options: chartOptions });
+        new Chart(document.getElementById('membersChart'), { type: 'bar', data: { labels, datasets: [{ label: 'Membros', data: memberData, backgroundColor: '#10b981', borderRadius: 6, maxBarThickness: 28 }] }, options: { ...chartOptions, plugins: { ...chartOptions.plugins, tooltip: { callbacks: { label: context => `${context.raw} membro(s)` } } } } });
+    </script>
+}

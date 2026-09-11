@@ -6,15 +6,23 @@
 
 <div class="page-shell">
     <div class="section-header">
-        <h1 class="page-title">Usuários</h1>
+        <div>
+            <div class="section-header__eyebrow"><i class="bi bi-person-gear"></i> Acesso e segurança</div>
+            <h1 class="page-title">Usuários</h1>
+            <p class="section-header__description">Gerencie quem pode acessar cada igreja.</p>
+        </div>
         <div class="toolbar">
-            <a asp-action="Register" class="btn btn-primary">
+            <a asp-action="Register" class="btn btn-primary btn-icon">
                 <i class="bi bi-person-plus-fill me-1"></i> Novo usuário
             </a>
         </div>
     </div>
 
     <div class="card-panel">
+        <div class="card-panel__header">
+            <strong>Contas cadastradas</strong>
+            <span class="card-panel__meta">@Model.Count() @(Model.Count() == 1 ? "usuário" : "usuários")</span>
+        </div>
         <div class="table-responsive">
             <table class="table data-table mb-0">
                 <thead>
@@ -29,23 +37,39 @@
                     @foreach (var usuario in Model)
                     {
                         <tr>
-                            <td>@usuario.UserName</td>
+                            <td>
+                                <div class="record-name">
+                                    <span class="record-name__icon"><i class="bi bi-person-fill"></i></span>
+                                    <span>
+                                        <span class="record-name__title">@usuario.UserName</span>
+                                        <span class="record-name__subtitle">@(usuario.IsGlobalAdmin ? "Administrador global" : "Acesso da igreja")</span>
+                                    </span>
+                                </div>
+                            </td>
                             <td>
                                 <span class="status-pill @(usuario.Ativo ? "" : "inactive")">
                                     @(usuario.Ativo ? "Ativo" : "Inativo")
                                 </span>
                             </td>
-                            <td>@(usuario.IsGlobalAdmin ? "Sim" : "Não")</td>
+                            <td><span class="status-pill @(usuario.IsGlobalAdmin ? "" : "inactive")">@(usuario.IsGlobalAdmin ? "Sim" : "Não")</span></td>
                             <td>
                                 <div class="table-actions">
-                                    <a asp-action="Edit" asp-route-id="@usuario.Id" class="btn btn-sm btn-warning">Editar</a>
+                                    <a asp-action="Edit" asp-route-id="@usuario.Id" class="btn btn-sm btn-warning btn-icon" title="Editar usuário">
+                                        <i class="bi bi-pencil-square"></i><span class="d-none d-md-inline">Editar</span>
+                                    </a>
                                     <form asp-action="Delete" asp-route-id="@usuario.Id" method="post" class="d-inline" onsubmit="return confirm('Deseja realmente excluir este usuário?');">
                                         @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                        <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Excluir usuário">
+                                            <i class="bi bi-trash3"></i><span class="d-none d-md-inline">Excluir</span>
+                                        </button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="4" class="table-empty"><i class="bi bi-people"></i>Nenhum usuário cadastrado ainda.</td></tr>
                     }
                 </tbody>
             </table>

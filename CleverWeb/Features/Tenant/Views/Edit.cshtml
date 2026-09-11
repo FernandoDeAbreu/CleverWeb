@@ -6,10 +6,19 @@
 
 <div class="page-shell">
     <div class="form-card">
-        <h2>Editar igreja</h2>
+        <div class="form-card__header">
+            <span class="record-name__icon"><i class="bi bi-building-gear"></i></span>
+            <div>
+                <div class="section-header__eyebrow">Configuração da unidade</div>
+                <h2>Editar igreja</h2>
+                <p>Atualize a identificação e a disponibilidade desta igreja.</p>
+            </div>
+        </div>
 
         <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="form-section-title"><i class="bi bi-info-circle"></i> Identificação</div>
 
             <div class="mb-3">
                 <label asp-for="Nome" class="form-label"></label>

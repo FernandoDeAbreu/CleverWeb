@@ -6,10 +6,19 @@
 
 <div class="page-shell">
     <div class="form-card">
-        <h2>Editar usuário</h2>
+        <div class="form-card__header">
+            <span class="record-name__icon"><i class="bi bi-person-gear"></i></span>
+            <div>
+                <div class="section-header__eyebrow">Configuração de acesso</div>
+                <h2>Editar usuário</h2>
+                <p>Atualize os dados, permissões e status desta conta.</p>
+            </div>
+        </div>
 
         <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="form-section-title"><i class="bi bi-person-vcard"></i> Dados da conta</div>
 
             <div class="mb-3">
                 <label asp-for="UserName" class="form-label"></label>
@@ -52,6 +61,8 @@
             {
                 <div class="alert alert-warning">Você não pode remover o status de administrador global do seu próprio usuário.</div>
             }
+
+            <div class="form-section-title"><i class="bi bi-shield-lock"></i> Trocar senha</div>
 
             <div class="mb-3">
                 <label asp-for="NovaSenha" class="form-label"></label>

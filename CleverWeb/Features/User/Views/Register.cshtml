@@ -6,10 +6,19 @@
 
 <div class="page-shell">
     <div class="form-card">
-        <h2>Cadastrar usuário</h2>
+        <div class="form-card__header">
+            <span class="record-name__icon"><i class="bi bi-person-plus-fill"></i></span>
+            <div>
+                <div class="section-header__eyebrow">Novo acesso</div>
+                <h2>Cadastrar usuário</h2>
+                <p>Crie uma conta vinculada a um membro da igreja.</p>
+            </div>
+        </div>
 
         <form asp-action="Register" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="form-section-title"><i class="bi bi-person-vcard"></i> Dados da conta</div>
 
             <div class="mb-3">
                 <label asp-for="UserName" class="form-label"></label>
@@ -35,6 +44,8 @@
                 </select>
                 <span asp-validation-for="MembroId" class="text-danger"></span>
             </div>
+
+            <div class="form-section-title"><i class="bi bi-shield-lock"></i> Segurança</div>
 
             <div class="mb-3">
                 <label asp-for="Senha" class="form-label"></label>

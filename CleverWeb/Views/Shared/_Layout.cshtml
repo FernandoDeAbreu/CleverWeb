@@ -19,57 +19,26 @@
 
 <body class="bg-light d-flex flex-column min-vh-100">
 
-    <!-- NAVBAR SUPERIOR -->
-    <nav class="navbar navbar-dark bg-primary shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold d-flex align-items-center" asp-controller="Dashboard" asp-action="Index">
-                <i class="bi bi-people-fill me-2"></i> @tenantName.ToUpperInvariant()
-            </a>
+    <nav class="navbar navbar-dark bg-primary shadow-sm topbar">
+        <div class="container-fluid px-3">
+            <div class="topbar__brand">
+                <a class="navbar-brand fw-bold d-flex align-items-center m-0" asp-controller="Dashboard" asp-action="Index">
+                    <i class="bi bi-people-fill me-2"></i>
+                    <span>@tenantName</span>
+                </a>
+            </div>
 
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <span class="badge bg-light text-primary px-3 py-2 fw-semibold">
-                        <i class="bi bi-person-circle me-1"></i>@usuarioLogado
-                    </span>
-
-                    <a asp-controller="Membro" asp-action="Index" class="btn btn-sm btn-light text-primary fw-semibold">
-                        Membros
-                    </a>
-                    <a asp-controller="Caixa" asp-action="Fechamento" class="btn btn-sm btn-light text-primary fw-semibold">
-                        Fechar caixa
-                    </a>
-                    <a asp-controller="Caixa" asp-action="Index" class="btn btn-sm btn-light text-primary fw-semibold">
-                        Relatório de caixa
-                    </a>
-                    <a asp-controller="Contribuicao" asp-action="Relatorio" class="btn btn-sm btn-light text-primary fw-semibold">
-                        Relatório de lançamentos
-                    </a>
-
-                    <a asp-controller="User" asp-action="Index" class="btn btn-sm btn-light text-primary fw-semibold">
-                        Usuários
-                    </a>
-
-                    @if (User.HasClaim("is_global_admin", "true"))
-                    {
-                        <a asp-controller="Tenant" asp-action="Index" class="btn btn-sm btn-light text-primary fw-semibold">
-                            Igrejas
-                        </a>
-                    }
-
-                    <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-sm btn-outline-light text-white border-white">
-                            <i class="bi bi-box-arrow-right me-1"></i> Sair
-                        </button>
-                    </form>
+                <div class="topbar__user">
+                    <i class="bi bi-person-circle me-2"></i>
+                    <span>@usuarioLogado</span>
                 </div>
             }
         </div>
     </nav>
 
-    <!-- CONTEÚDO -->
-    <main class="container py-4 flex-grow-1">
+    <main class="container py-3 flex-grow-1">
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show shadow-sm text-center">
@@ -81,27 +50,72 @@
         @RenderBody()
     </main>
 
-    <!-- NAVBAR INFERIOR -->
-    <nav class="navbar bg-white fixed-bottom shadow-sm border-top">
-        <div class="container-fluid justify-content-around text-center">
-            <a asp-controller="Dashboard" asp-action="Index" class="text-dark text-decoration-none">
-                <i class="bi bi-house-fill fs-4"></i>
-                <div class="small">Início</div>
+    <nav class="navbar bg-white fixed-bottom shadow-sm border-top bottom-nav">
+        <div class="container-fluid justify-content-around text-center px-2">
+            <a asp-controller="Dashboard" asp-action="Index" class="bottom-nav__item">
+                <i class="bi bi-house-fill"></i>
+                <span>Início</span>
             </a>
-            <a asp-controller="Contribuicao" asp-action="MembroList" class="text-dark text-decoration-none">
-                <i class="bi bi-cash-stack fs-4"></i>
-                <div class="small">Contribuições</div>
+            <a asp-controller="Contribuicao" asp-action="MembroList" class="bottom-nav__item">
+                <i class="bi bi-cash-stack"></i>
+                <span>Contribuições</span>
             </a>
-            <a asp-controller="Despesa" asp-action="Index" class="text-dark text-decoration-none">
-                <i class="bi bi-upc-scan fs-4"></i>
-                <div class="small">Despesas</div>
+            <a asp-controller="Despesa" asp-action="Index" class="bottom-nav__item">
+                <i class="bi bi-upc-scan"></i>
+                <span>Despesas</span>
             </a>
-            <a asp-controller="Home" asp-action="Index" class="text-dark text-decoration-none">
-                <i class="bi bi-node-plus fs-4"></i>
-                <div class="small">Mais</div>
-            </a>
+            <button type="button" class="bottom-nav__item bottom-nav__toggle" data-menu-toggle aria-expanded="false">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+                <span>Mais</span>
+            </button>
         </div>
     </nav>
+
+    <div id="mainMenuPanel" class="main-menu-panel" aria-hidden="true">
+        <div class="main-menu-panel__header">
+            <span>Menu principal</span>
+            <button type="button" class="main-menu-panel__close" data-menu-close aria-label="Fechar menu">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="main-menu-panel__list">
+            <a asp-controller="Membro" asp-action="Index" class="main-menu-panel__item">
+                <i class="bi bi-people-fill"></i>
+                <span>Membros</span>
+            </a>
+            <a asp-controller="Caixa" asp-action="Fechamento" class="main-menu-panel__item">
+                <i class="bi bi-bank"></i>
+                <span>Fechar caixa</span>
+            </a>
+            <a asp-controller="Caixa" asp-action="Index" class="main-menu-panel__item">
+                <i class="bi bi-file-bar-graph"></i>
+                <span>Relatório de caixa</span>
+            </a>
+            <a asp-controller="Contribuicao" asp-action="Relatorio" class="main-menu-panel__item">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Relatório de lançamentos</span>
+            </a>
+            <a asp-controller="User" asp-action="Index" class="main-menu-panel__item">
+                <i class="bi bi-person-gear"></i>
+                <span>Usuários</span>
+            </a>
+            @if (User.HasClaim("is_global_admin", "true"))
+            {
+                <a asp-controller="Tenant" asp-action="Index" class="main-menu-panel__item">
+                    <i class="bi bi-building"></i>
+                    <span>Igrejas</span>
+                </a>
+            }
+            <form asp-controller="Auth" asp-action="Logout" method="post" class="main-menu-panel__logout">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="main-menu-panel__item main-menu-panel__item--logout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Sair</span>
+                </button>
+            </form>
+        </div>
+    </div>
 
     <style>
         body {
@@ -109,72 +123,173 @@
         }
 
         main {
-            padding-bottom: 80px; /* espaço para não ficar escondido atrás da navbar inferior */
+            padding-bottom: 92px;
         }
 
-        .navbar.fixed-bottom i {
-            font-size: 1.5rem;
+        .topbar {
+            min-height: 68px;
         }
 
-        .navbar.fixed-bottom div {
-            font-size: 0.75rem;
-        }
-
-        .quick-menu {
-            background: #ffffff;
-            border: 1px solid #e7edf5;
-            border-radius: 1rem;
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
-            padding: 0.85rem;
-        }
-
-        .quick-menu__grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 0.85rem;
-        }
-
-        .quick-menu__item {
+        .topbar__brand {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.85rem 0.9rem;
-            border-radius: 0.9rem;
+        }
+
+        .topbar__brand .navbar-brand {
+            font-size: 1rem;
+            letter-spacing: 0.02em;
+        }
+
+        .topbar__user {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 600;
+            max-width: 58vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bottom-nav {
+            min-height: 72px;
+            padding: 0.25rem 0;
+        }
+
+        .bottom-nav__item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+            color: #475569;
+            text-decoration: none;
+            background: transparent;
+            border: 0;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.4rem 0.2rem;
+        }
+
+        .bottom-nav__item i {
+            font-size: 1.4rem;
+        }
+
+        .bottom-nav__item.active,
+        .bottom-nav__item:hover {
+            color: #0d6efd;
+        }
+
+        .bottom-nav__toggle {
+            color: #475569;
+        }
+
+        .main-menu-panel {
+            position: fixed;
+            right: 0;
+            bottom: 72px;
+            left: 0;
+            z-index: 1030;
+            background: rgba(15, 23, 42, 0.25);
+            backdrop-filter: blur(3px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+
+        .main-menu-panel.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .main-menu-panel__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+            color: #fff;
+            padding: 0.8rem 1rem;
+            font-weight: 700;
+        }
+
+        .main-menu-panel__close {
+            background: transparent;
+            border: 0;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .main-menu-panel__list {
+            background: #fff;
+            border-top: 1px solid #e7edf5;
+            padding: 0.75rem;
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .main-menu-panel__item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            width: 100%;
+            border: 1px solid #edf2f7;
+            border-radius: 0.8rem;
             background: #f8fafc;
             color: #1f2937;
             text-decoration: none;
-            border: 1px solid #edf2f7;
-            transition: all 0.2s ease;
+            padding: 0.9rem 1rem;
             font-weight: 600;
         }
 
-        .quick-menu__item:hover {
-            background: #eef4ff;
-            border-color: #dbeafe;
-            transform: translateY(-1px);
-            text-decoration: none;
-            color: #1f2937;
+        .main-menu-panel__item i {
+            color: #0d6efd;
+            font-size: 1.1rem;
         }
 
-        .quick-menu__icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: #e8f1ff;
-            color: #0d6efd;
-            flex-shrink: 0;
+        .main-menu-panel__item--logout {
+            background: #fff5f5;
+            border-color: #fecaca;
+            color: #b42318;
+        }
+
+        .main-menu-panel__item--logout i {
+            color: #b42318;
+        }
+
+        .main-menu-panel__logout {
+            margin: 0;
+        }
+
+        .main-menu-panel__logout button {
+            border: 1px solid #fecaca;
         }
 
         .alert {
             border-radius: 12px;
         }
 
-        @@media (max-width: 767.98px) {
-            .quick-menu__grid {
-                grid-template-columns: 1fr 1fr;
+        @@media (min-width: 768px) {
+            .topbar__brand .navbar-brand {
+                font-size: 1.1rem;
+            }
+
+            .topbar__user {
+                max-width: none;
+            }
+
+            .main-menu-panel {
+                left: auto;
+                width: min(420px, 92vw);
+                right: 1rem;
+                bottom: 88px;
             }
         }
     </style>
@@ -182,6 +297,44 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        (function () {
+            const toggleButton = document.querySelector('[data-menu-toggle]');
+            const panel = document.getElementById('mainMenuPanel');
+            const closeButton = document.querySelector('[data-menu-close]');
+
+            if (!toggleButton || !panel) return;
+
+            const setMenuState = function (isOpen) {
+                panel.classList.toggle('show', isOpen);
+                panel.setAttribute('aria-hidden', String(!isOpen));
+                toggleButton.setAttribute('aria-expanded', String(isOpen));
+            };
+
+            toggleButton.addEventListener('click', function () {
+                const isOpen = panel.classList.contains('show');
+                setMenuState(!isOpen);
+            });
+
+            if (closeButton) {
+                closeButton.addEventListener('click', function () {
+                    setMenuState(false);
+                });
+            }
+
+            panel.addEventListener('click', function (event) {
+                if (event.target === panel) {
+                    setMenuState(false);
+                }
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    setMenuState(false);
+                }
+            });
+        })();
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
