@@ -34,6 +34,25 @@ jobs:
           chmod 600 ~/.ssh/cleverweb_deploy
           ssh-keyscan -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Test SSH key
+        run: |
+          echo "Fingerprint da chave privada no runner:"
+          ssh-keygen -lf ~/.ssh/cleverweb_deploy
+
+          echo "Validando chave privada:"
+          ssh-keygen -y -f ~/.ssh/cleverweb_deploy > /tmp/deploy.pub
+
+          echo "Fingerprint da chave pública derivada:"
+          ssh-keygen -lf /tmp/deploy.pub
+
+          echo "Testando SSH:"
+          ssh -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -i ~/.ssh/cleverweb_deploy \
+            -p ${{ secrets.VPS_PORT }} \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "echo SSH_OK"
+
       - name: Deploy
         run: |
           rsync -avz --delete \
