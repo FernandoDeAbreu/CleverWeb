@@ -15,7 +15,8 @@
             </div>
         </div>
 
-        <form asp-action="Edit" method="post">
+        <form asp-action="Edit" asp-route-id="@ViewContext.RouteData.Values["id"]" method="post">
+            @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="form-section-title"><i class="bi bi-info-circle"></i> Identificação</div>
@@ -38,8 +39,14 @@
             </div>
 
             <div class="form-actions">
-                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                <button type="submit" formaction="@Url.Action("ToggleStatus", "Tenant", new { id = ViewContext.RouteData.Values["id"] })" formmethod="post" class="btn @(Model.Ativo ? "btn-secondary" : "btn-success")">
+                    <i class="bi @(Model.Ativo ? "bi-pause-circle" : "bi-play-circle") me-1"></i>@(Model.Ativo ? "Desativar" : "Ativar")
+                </button>
+                <button type="submit" formaction="@Url.Action("Delete", "Tenant", new { id = ViewContext.RouteData.Values["id"] })" formmethod="post" class="btn btn-danger" onclick="return confirm('Deseja realmente excluir esta igreja?');">
+                    <i class="bi bi-trash3 me-1"></i>Excluir
+                </button>
             </div>
         </form>
     </div>

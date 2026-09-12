@@ -102,10 +102,28 @@ namespace CleverWeb.Features.Caixa.Services
             };
         }
 
-        public async Task<List<ViewModels.CaixaViewModel>> HistoricoCaixa()
+        public async Task<List<ViewModels.CaixaViewModel>> HistoricoCaixa(DateTime? dataInicio = null, DateTime? dataFim = null, Data.Shared.Enums.TipoContribuicao? tipoContribuicao = null)
         {
             var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
-            var caixa = await _context.Caixa.Where(c => c.TenantId == tenantId).OrderByDescending(c => c.DtFechamento).ToListAsync();
+
+            var query = _context.Caixa.Where(c => c.TenantId == tenantId).AsQueryable();
+
+            if (tipoContribuicao.HasValue)
+            {
+                query = query.Where(c => c.TipoContribuicao == tipoContribuicao.Value);
+            }
+
+            if (dataInicio.HasValue)
+            {
+                query = query.Where(c => c.DtFechamento >= dataInicio.Value.Date);
+            }
+
+            if (dataFim.HasValue)
+            {
+                query = query.Where(c => c.DtFechamento <= dataFim.Value.Date);
+            }
+
+            var caixa = await query.OrderByDescending(c => c.DtFechamento).ToListAsync();
 
             return _mapper.Map<List<CaixaViewModel>>(caixa);
         }

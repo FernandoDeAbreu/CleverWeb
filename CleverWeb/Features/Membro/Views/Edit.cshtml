@@ -4,42 +4,54 @@
     ViewData["Title"] = "Editar membro";
 }
 
-<h2>Editar membro</h2>
+<div class="page-shell">
+    <div class="form-card">
+        <div class="form-card__header">
+            <span class="record-name__icon"><i class="bi bi-person-badge"></i></span>
+            <div>
+                <div class="section-header__eyebrow">Cadastro geral</div>
+                <h2>Editar membro</h2>
+                <p>Atualize os dados cadastrais do membro selecionado.</p>
+            </div>
+        </div>
 
-<form asp-action="Edit" asp-controller="Membro" method="post">
-    @Html.AntiForgeryToken()
+        <form asp-action="Edit" asp-controller="Membro" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    <!-- ID oculto (obrigatório para o POST) -->
-    <input type="hidden" asp-for="Id" />
+            <div class="form-section-title"><i class="bi bi-info-circle"></i> Dados pessoais</div>
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row g-3">
+                <div class="col-12">
+                    <label asp-for="Nome" class="form-label"></label>
+                    <input asp-for="Nome" class="form-control" />
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Nome" class="form-label"></label>
-        <input asp-for="Nome" class="form-control" />
-        <span asp-validation-for="Nome" class="text-danger"></span>
+                <div class="col-md-6">
+                    <label asp-for="DataNascimento" class="form-label"></label>
+                    <input asp-for="DataNascimento" class="form-control" type="date" />
+                    <span asp-validation-for="DataNascimento" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Telefone" class="form-label"></label>
+                    <input asp-for="Telefone" class="form-control" />
+                    <span asp-validation-for="Telefone" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a asp-action="Index" asp-controller="Membro" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                <button type="submit" formmethod="post" formaction="@Url.Action("DeleteConfirmed", "Membro", new { id = Model.Id })" class="btn btn-danger ms-auto" onclick="return confirm('Deseja realmente excluir este membro?');">
+                    <i class="bi bi-trash3 me-1"></i>Excluir
+                </button>
+            </div>
+        </form>
     </div>
-
-
-    <div class="form-group mb-3">
-        <label asp-for="DataNascimento" class="form-label"></label>
-        <input asp-for="DataNascimento" class="form-control" type="date" />
-        <span asp-validation-for="DataNascimento" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Telefone" class="form-label"></label>
-        <input asp-for="Telefone" class="form-control" />
-        <span asp-validation-for="Telefone" class="text-danger"></span>
-    </div>
-
-    <div class="container-fluid d-flex justify-content-between align-items-center align-baseline">
-        <a asp-action="Index" asp-controller="Membro" class="btn btn-secondary me-2">Voltar</a>
-        <button type="submit" class="btn btn-primary"> Salvar </button>
-    </div>
-
-
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

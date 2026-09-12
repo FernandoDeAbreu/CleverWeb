@@ -6,6 +6,9 @@
 @{
     ViewData["Title"] = "Fechamento de caixa";
     var filtro = ViewBag.Filtro as FiltroMovimentoCaixaViewModel;
+    var totalEntradas = Model.Lista.Where(x => x.Tipo == "Entrada").Sum(x => x.Valor);
+    var totalSaidas = Model.Lista.Where(x => x.Tipo == "Saída").Sum(x => Math.Abs(x.Valor));
+    var saldoCaixa = totalEntradas - totalSaidas;
 }
 
 
@@ -47,11 +50,12 @@
                             <i class="bi bi-funnel me-1"></i> Filtrar
                         </button>
 
-                        <button formaction="@Url.Action("FecharCaixa")"
-                                formmethod="get"
-                                disabled="@(!Model.Lista.Any())"
-                                 class="btn btn-danger w-100">
-                            <i class="me-1"></i> Fechar caixa
+                        <button type="button"
+                                class="btn btn-danger w-100"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmarFechamentoModal"
+                                disabled="@(!Model.Lista.Any())">
+                            <i class="bi bi-lock me-1"></i> Fechar caixa
                         </button>
                     </div>
                 </div>
@@ -68,7 +72,7 @@
                 <div>
                     <div class="text-muted small">Total do Período</div>
                     <div class="fs-4 fw-bold text-success">
-                        @Model.Lista.Sum(c => c.Valor).ToString("C", new CultureInfo("pt-BR"))
+                        @saldoCaixa.ToString("C", new CultureInfo("pt-BR"))
                     </div>
                 </div>
             </div>
@@ -77,6 +81,71 @@
                 @Model.Lista.Count() registro(s)
             </span>
 
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmarFechamentoModal" tabindex="-1" aria-labelledby="confirmarFechamentoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-2">
+                    <div>
+                        <h5 class="modal-title fw-bold" id="confirmarFechamentoModalLabel">Confirmar fechamento</h5>
+                        <small class="text-muted">Resumo do caixa antes de fechar</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+
+                <div class="modal-body pt-2">
+                    <div class="mb-3">
+                        <div class="text-muted small">Período</div>
+                        <div class="fw-semibold">
+                            @if (Model.Filtro.DataInicio.HasValue || Model.Filtro.DataFim.HasValue)
+                            {
+                                @(Model.Filtro.DataInicio?.ToString("dd/MM/yyyy") ?? "Início")
+                                <span class="mx-1">—</span>
+                                @(Model.Filtro.DataFim?.ToString("dd/MM/yyyy") ?? "Hoje")
+                            }
+                            else
+                            {
+                                <span>Todo o período</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="list-group list-group-flush rounded-3 overflow-hidden border">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Entradas</span>
+                            <strong class="text-success">@totalEntradas.ToString("C", new CultureInfo("pt-BR"))</strong>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Saídas</span>
+                            <strong class="text-danger">@totalSaidas.ToString("C", new CultureInfo("pt-BR"))</strong>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                            <span>Saldo final</span>
+                            <strong class="text-primary">@saldoCaixa.ToString("C", new CultureInfo("pt-BR"))</strong>
+                        </div>
+                    </div>
+
+                    <p class="text-muted small mt-3 mb-0">
+                        Ao confirmar, o caixa será encerrado e os registros deste período serão vinculados ao fechamento atual.
+                    </p>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                    <form asp-action="FecharCaixa" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Filtro.TipoContribuicao" />
+                        <input type="hidden" asp-for="Filtro.DataInicio" />
+                        <input type="hidden" asp-for="Filtro.DataFim" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-check-circle me-1"></i> Confirmar fechamento
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 

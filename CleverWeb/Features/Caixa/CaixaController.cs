@@ -16,9 +16,9 @@ namespace CleverWeb.Features.Caixa
             _caixaService = caixaService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(DateTime? dataInicio, DateTime? dataFim, Enums.TipoContribuicao? tipoContribuicao)
         {
-            var vm = await _caixaService.HistoricoCaixa();
+            var vm = await _caixaService.HistoricoCaixa(dataInicio, dataFim, tipoContribuicao);
             return View(vm);
         }
         public async Task<IActionResult> Fechamento(FiltroMovimentoCaixaViewModel filtro)
@@ -58,10 +58,12 @@ namespace CleverWeb.Features.Caixa
             return File(pdf, "application/pdf", "Contribuicoes.pdf");
         }
 
-        public IActionResult FecharCaixa(FiltroMovimentoCaixaViewModel filtro)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FecharCaixa(FiltroMovimentoCaixaViewModel filtro)
         {
             var vm = _caixaService.ObterRelatorio(filtro);
-            var pdf = _caixaService.FecharCaixa(vm);
+            await _caixaService.FecharCaixa(vm);
             return RedirectToAction(nameof(Index));
         }
     }

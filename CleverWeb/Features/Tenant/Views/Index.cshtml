@@ -11,12 +11,11 @@
             <h1 class="page-title">Igrejas</h1>
             <p class="section-header__description">Organize os espaços e os acessos da sua rede.</p>
         </div>
-        <div class="toolbar">
-            <a asp-action="Create" class="btn btn-primary btn-icon">
-                <i class="bi bi-plus-lg me-1"></i> Nova igreja
-            </a>
-        </div>
     </div>
+
+    <a asp-action="Create" class="fab-action" aria-label="Adicionar igreja">
+        <i class="bi bi-plus-lg"></i>
+    </a>
 
     <div class="card-panel">
         <div class="card-panel__header">
@@ -31,13 +30,12 @@
                         <th>Slug</th>
                         <th>Status</th>
                         <th>Data criação</th>
-                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var tenant in Model)
                     {
-                        <tr>
+                        <tr class="clickable-row" data-href="@Url.Action("Edit", "Tenant", new { id = tenant.Id })">
                             <td>
                                 <div class="record-name">
                                     <span class="record-name__icon"><i class="bi bi-building"></i></span>
@@ -54,33 +52,24 @@
                                 </span>
                             </td>
                             <td>@tenant.DataCriacao.ToString("dd/MM/yyyy")</td>
-                            <td>
-                                <div class="table-actions">
-                                    <a asp-action="Edit" asp-route-id="@tenant.Id" class="btn btn-sm btn-warning btn-icon" title="Editar igreja">
-                                        <i class="bi bi-pencil-square"></i><span class="d-none d-md-inline">Editar</span>
-                                    </a>
-                                    <form asp-action="ToggleStatus" asp-route-id="@tenant.Id" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-icon @(tenant.Ativo ? "btn-secondary" : "btn-success")" title="@(tenant.Ativo ? "Desativar igreja" : "Ativar igreja")">
-                                            <i class="bi @(tenant.Ativo ? "bi-pause-circle" : "bi-play-circle")"></i><span class="d-none d-md-inline">@(tenant.Ativo ? "Desativar" : "Ativar")</span>
-                                        </button>
-                                    </form>
-                                    <form asp-action="Delete" asp-route-id="@tenant.Id" method="post" class="d-inline" onsubmit="return confirm('Deseja realmente excluir esta igreja?');">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Excluir igreja">
-                                            <i class="bi bi-trash3"></i><span class="d-none d-md-inline">Excluir</span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
                         </tr>
                     }
                     @if (!Model.Any())
                     {
-                        <tr><td colspan="5" class="table-empty"><i class="bi bi-buildings"></i>Nenhuma igreja cadastrada ainda.</td></tr>
+                        <tr><td colspan="4" class="table-empty"><i class="bi bi-buildings"></i>Nenhuma igreja cadastrada ainda.</td></tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.clickable-row[data-href]').forEach(function (row) {
+            row.addEventListener('click', function () {
+                window.location.href = row.dataset.href;
+            });
+        });
+    </script>
+}

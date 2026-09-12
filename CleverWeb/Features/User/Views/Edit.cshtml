@@ -77,8 +77,11 @@
             </div>
 
             <div class="form-actions">
-                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                <button type="submit" formaction="@Url.Action("Delete", "User", new { id = Model.Id })" formmethod="post" class="btn btn-danger ms-auto" onclick="return confirm('Deseja realmente excluir este usuário?');">
+                    <i class="bi bi-trash3 me-1"></i>Excluir
+                </button>
             </div>
         </form>
     </div>

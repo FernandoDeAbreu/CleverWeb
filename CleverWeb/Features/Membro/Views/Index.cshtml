@@ -5,107 +5,66 @@
     ViewData["Title"] = "Membros";
 }
 
-<h5 class="mb-3 fw-bold">
-    <i class="bi bi-people-fill text-primary"></i> Membros
-</h5>
+<div class="page-shell">
+    <div class="section-header">
+        <div>
+            <div class="section-header__eyebrow"><i class="bi bi-people-fill"></i> Cadastro geral</div>
+            <h1 class="page-title">Membros</h1>
+            <p class="section-header__description">Gerencie os membros da igreja e suas informações cadastradas.</p>
+        </div>
+    </div>
 
-<!-- Botão flutuante (ação primária) -->
-<a asp-action="Create"
-   asp-controller="Membro"
-   class="fab-action bg-primary"
-   aria-label="Adicionar membro">
-    <i class="bi bi-person-plus-fill"></i>
-</a>
+    <a asp-action="Create" asp-controller="Membro" class="fab-action" aria-label="Adicionar membro">
+        <i class="bi bi-person-plus-fill"></i>
+    </a>
 
-<div class="list-group list-group-flush">
-    @foreach (var item in Model)
-    {
-        string[] partes = item.Nome.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        string iniciais = string.Join("", partes.Take(2).Select(p => p[0])).ToUpper();
+    <div class="card-panel">
+        <div class="card-panel__header">
+            <strong>Membros cadastrados</strong>
+            <span class="card-panel__meta">@Model.Count() @(Model.Count() == 1 ? "membro" : "membros")</span>
+        </div>
 
-        <a asp-action="Edit"
-           asp-controller="Membro"
-           asp-route-id="@item.Id"
-           class="list-group-item list-group-item-action py-3">
+        <div class="table-responsive">
+            <table class="table data-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Membro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        string[] partes = item.Nome.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        string iniciais = string.Join("", partes.Take(2).Select(p => p[0])).ToUpper();
 
-            <div class="d-flex align-items-center">
-                <!-- Avatar -->
-                <div class="avatar-circle bg-primary text-white">
-                    @iniciais
-                </div>
+                        <tr class="clickable-row" data-href="@Url.Action("Edit", "Membro", new { id = item.Id })">
+                            <td>
+                                <div class="record-name">
+                                    <span class="record-name__icon bg-primary-subtle text-primary">@iniciais</span>
+                                    <span class="record-name__title">@item.Nome</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
 
-                <!-- Nome -->
-                <div class="flex-grow-1 ms-3">
-                    <div class="fw-semibold text-dark">
-                        @item.Nome
-                    </div>
-                </div>
-
-                <!-- Ícone -->
-                <div class="ms-2 text-muted">
-                    <i class="bi bi-chevron-right"></i>
-                </div>
-            </div>
-        </a>
-    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td class="table-empty"><i class="bi bi-people"></i>Nenhum membro cadastrado ainda.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-
-<!-- CSS -->
-<style>
-    /* Floating Action Button */
-    .fab-action {
-        position: fixed;
-        bottom: 80px;
-        right: 16px;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        color: #fff;
-        font-size: 24px;
-        box-shadow: 0 6px 12px rgba(0,0,0,.25);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        transition: transform .2s ease, box-shadow .2s ease;
-    }
-
-        .fab-action:active {
-            transform: scale(.95);
-        }
-
-    /* Avatar */
-    .avatar-circle {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        font-size: 1.1rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Lista */
-    .list-group-item {
-        border: 0;
-        border-bottom: 1px solid #eee;
-    }
-
-    /* Desktop refinamento */
-    media (min-width: 768px) {
-        .fab-action
-
-    {
-        bottom: 40px;
-        right: 40px;
-    }
-
-    .list-group-item {
-        border-radius: 8px;
-        margin-bottom: 8px;
-        border: 1px solid #eee;
-    }
-       
-</style>
+@section Scripts {
+    <script>
+        document.querySelectorAll('.clickable-row[data-href]').forEach(function (row) {
+            row.addEventListener('click', function () {
+                window.location.href = row.dataset.href;
+            });
+        });
+    </script>
+}
