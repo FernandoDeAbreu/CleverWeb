@@ -17,6 +17,22 @@
         <i class="bi bi-plus-lg"></i>
     </a>
 
+    @if (TempData["Success"] is string sucesso)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-1"></i> @sucesso
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] is string erro)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-1"></i> @erro
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
+
     <div class="card-panel">
         <div class="card-panel__header">
             <strong>Fornecedores cadastrados</strong>
