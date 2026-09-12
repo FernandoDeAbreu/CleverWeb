@@ -54,19 +54,34 @@ namespace CleverWeb.Features.Membro
 
         public IActionResult Create()
         {
-            return View(new MembroViewModel());
+            var model = new MembroViewModel
+            {
+                TenantId = _tenantAccessor.CurrentTenantId ?? 0
+            };
+
+            CarregarOpcoesTenant(model);
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MembroViewModel model)
         {
+            var tenantId = ObterTenantParaCadastro(model);
+            if (tenantId <= 0)
+                ModelState.AddModelError(nameof(model.TenantId), "Selecione uma igreja válida para o membro.");
+            else if (!_db.Tenant.Any(tenant => tenant.Id == tenantId && tenant.Ativo))
+                ModelState.AddModelError(nameof(model.TenantId), "Essa igreja não está ativa ou não existe.");
+
             if (!ModelState.IsValid)
+            {
+                CarregarOpcoesTenant(model);
                 return View(model);
+            }
 
             var entidade = _mapper.Map<Models.Membro>(model);
             entidade.DataCadastro = DateTime.UtcNow;
-            entidade.TenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            entidade.TenantId = tenantId;
 
             _db.Membro.Add(entidade);
             await _db.SaveChangesAsync();
@@ -74,6 +89,32 @@ namespace CleverWeb.Features.Membro
             TempData["Success"] = "Membro cadastrado com sucesso!";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private int ObterTenantParaCadastro(MembroViewModel model)
+        {
+            if (User.HasClaim("is_global_admin", "true"))
+                return model.TenantId;
+
+            model.TenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            return model.TenantId;
+        }
+
+        private void CarregarOpcoesTenant(MembroViewModel model)
+        {
+            if (!User.HasClaim("is_global_admin", "true"))
+                return;
+
+            model.TenantOptions = _db.Tenant
+                .Where(tenant => tenant.Ativo)
+                .OrderBy(tenant => tenant.Nome)
+                .Select(tenant => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Value = tenant.Id.ToString(),
+                    Text = tenant.Nome,
+                    Selected = tenant.Id == model.TenantId
+                })
+                .ToList();
         }
 
         public async Task<IActionResult> Edit(int id)

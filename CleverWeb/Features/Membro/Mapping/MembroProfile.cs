@@ -7,7 +7,9 @@ namespace CleverWeb.Features.Membro.Mapping
     {
         public MembroProfile()
         {
-            CreateMap<Models.Membro, MembroViewModel>().ReverseMap();
+            CreateMap<Models.Membro, MembroViewModel>();
+            CreateMap<MembroViewModel, Models.Membro>()
+                .ForMember(dest => dest.TenantId, options => options.Ignore());
         }
     }
 }

@@ -50,7 +50,7 @@ namespace CleverWeb.Data.Reports
                  .BorderLeft(0.5f).Text($" Congregação: {_tenantName} ").FontSize(12);
                 col.Item()
                  .BorderRight(0.5f)
-                 .BorderLeft(0.5f).Text(" Endereço: Rua Goias 1634 - Centro - Açailândia-MA").FontSize(12);
+                 .BorderLeft(0.5f).Text(" Endereço: Rua - Centro - Açailândia-MA").FontSize(12);
                 col.Item()
                  .BorderRight(0.5f)
                  .BorderLeft(0.5f)
@@ -84,7 +84,7 @@ namespace CleverWeb.Data.Reports
                     .Italic();
 
                 col.Spacing(20);
-                col.Item().BorderTop(0.5f).Text("Pr. Fernando de Abreu Silva").AlignCenter()
+                col.Item().BorderTop(0.5f).Text("Pastor Congregacional").AlignCenter()
                    .Italic();
 
             });

@@ -9,6 +9,19 @@
     <i class="bi bi-graph-up-arrow text-primary"></i> Lançar contribuição
 </h2>
 
+<form asp-action="MembroList" asp-controller="Contribuicao" method="get" class="mb-3">
+    <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="search" name="nome" value="@ViewBag.NomePesquisa" class="form-control"
+               placeholder="Pesquisar membro por nome" aria-label="Pesquisar membro por nome" />
+        <button type="submit" class="btn btn-primary">Pesquisar</button>
+        @if (!string.IsNullOrWhiteSpace(ViewBag.NomePesquisa as string))
+        {
+            <a asp-action="MembroList" asp-controller="Contribuicao" class="btn btn-outline-secondary">Limpar</a>
+        }
+    </div>
+</form>
+
 <!-- Botão flutuante (ação primária) -->
 <a asp-action="Index"
    asp-controller="Contribuicao"

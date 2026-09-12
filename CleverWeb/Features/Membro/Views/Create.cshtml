@@ -1,15 +1,26 @@
 ﻿@model MembroViewModel
 
 @{
-    ViewData["Title"] = "Novo Membro";
+    ViewData["Title"] = "Novo membro";
 }
 
-<h2>Novo Membro</h2>
+<h2>Novo membro</h2>
 
 <form asp-action="Create" asp-controller="Membro" method="post">
     @Html.AntiForgeryToken()
 
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    @if (User.HasClaim("is_global_admin", "true"))
+    {
+        <div class="mb-3">
+            <label asp-for="TenantId" class="form-label"></label>
+            <select asp-for="TenantId" asp-items="Model.TenantOptions" class="form-select">
+                <option value="">Selecione a igreja</option>
+            </select>
+            <span asp-validation-for="TenantId" class="text-danger"></span>
+        </div>
+    }
 
     <div class="mb-3">
         <label asp-for="Nome" class="form-label"></label>

@@ -43,16 +43,22 @@ namespace CleverWeb.Features.Contribuicao
             return View(vm);
         }
 
-        public async Task<IActionResult> MembroList()
+        public async Task<IActionResult> MembroList(string? nome)
         {
             var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
 
-            var Membro = await _db.Membro
-                .Where(m => m.TenantId == tenantId)
+            var consulta = _db.Membro
+                .Where(m => m.TenantId == tenantId);
+
+            if (!string.IsNullOrWhiteSpace(nome))
+                consulta = consulta.Where(m => m.Nome.Contains(nome));
+
+            var Membro = await consulta
                 .AsNoTracking()
                 .OrderBy(m => m.Nome)
                 .ToListAsync();
 
+            ViewBag.NomePesquisa = nome;
             var vm = _mapper.Map<List<MembroViewModel>>(Membro);
             return View(vm);
         }

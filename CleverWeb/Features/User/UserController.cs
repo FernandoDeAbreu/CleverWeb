@@ -122,6 +122,32 @@ namespace CleverWeb.Features.Users
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult MembrosPorTenant(int tenantId)
+        {
+            if (!User.HasClaim("is_global_admin", "true"))
+            {
+                var tenantAtual = HttpContext.User.FindFirst("tenant_id")?.Value;
+                if (!int.TryParse(tenantAtual, out var tenantIdAtual) || tenantIdAtual != tenantId)
+                    return Forbid();
+            }
+
+            if (!_db.Tenant.Any(tenant => tenant.Id == tenantId && tenant.Ativo))
+                return BadRequest();
+
+            var membros = _db.Membro
+                .Where(membro => membro.TenantId == tenantId)
+                .OrderBy(membro => membro.Nome)
+                .Select(membro => new
+                {
+                    id = membro.Id,
+                    nome = membro.Nome
+                })
+                .ToList();
+
+            return Json(membros);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Register(RegisterUserViewModel model)

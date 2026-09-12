@@ -12,7 +12,10 @@ namespace CleverWeb.Features.Despesa.ViewModels
         [Display(Name = "Descrição")]
         public string Descricao { get; set; } = string.Empty;
 
-        public decimal Valor { get; set; } = decimal.Parse("0,00");
+        [Required]
+        [Range(0.01, 999999.99, ErrorMessage = "Informe um valor válido em reais.")]
+        [DataType(DataType.Currency)]
+        public decimal Valor { get; set; }
 
         [Display(Name = "Data do pagamento")]
 
@@ -26,7 +29,7 @@ namespace CleverWeb.Features.Despesa.ViewModels
 
         public int FornecedorId { get; set; }
 
-        public Fornecedor? Fornecedor { get; set; }
+        public Models.Fornecedor? Fornecedor { get; set; }
 
         public IEnumerable<SelectListItem>? FornecedorList { get; set; }
 

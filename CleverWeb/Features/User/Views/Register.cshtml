@@ -1,7 +1,7 @@
 ﻿@model CleverWeb.Features.Users.ViewModels.RegisterUserViewModel
 
 @{
-    ViewData["Title"] = "Cadastrar usuário";
+    ViewData["Title"] = "Novo usuário";
 }
 
 <div class="page-shell">
@@ -10,7 +10,7 @@
             <span class="record-name__icon"><i class="bi bi-person-plus-fill"></i></span>
             <div>
                 <div class="section-header__eyebrow">Novo acesso</div>
-                <h2>Cadastrar usuário</h2>
+                <h2>Novo usuário</h2>
                 <p>Crie uma conta vinculada a um membro da igreja.</p>
             </div>
         </div>
@@ -30,7 +30,7 @@
             {
                 <div class="mb-3">
                     <label asp-for="TenantId" class="form-label"></label>
-                    <select asp-for="TenantId" asp-items="Model.TenantOptions" class="form-select">
+                    <select asp-for="TenantId" asp-items="Model.TenantOptions" class="form-select" id="TenantId">
                         <option value="">Selecione a igreja/tenant</option>
                     </select>
                     <span asp-validation-for="TenantId" class="text-danger"></span>
@@ -39,7 +39,7 @@
 
             <div class="mb-3">
                 <label asp-for="MembroId" class="form-label"></label>
-                <select asp-for="MembroId" asp-items="Model.MembroOptions" class="form-select">
+                <select asp-for="MembroId" asp-items="Model.MembroOptions" class="form-select" id="MembroId">
                     <option value="">Selecione o membro</option>
                 </select>
                 <span asp-validation-for="MembroId" class="text-danger"></span>
@@ -66,3 +66,37 @@
         </form>
     </div>
 </div>
+
+@if (User.HasClaim("is_global_admin", "true"))
+{
+    <script>
+        const tenantSelect = document.getElementById('TenantId');
+        const membroSelect = document.getElementById('MembroId');
+
+        tenantSelect.addEventListener('change', async function () {
+            const tenantId = this.value;
+            membroSelect.innerHTML = '<option value="">Selecione o membro</option>';
+            membroSelect.disabled = !tenantId;
+
+            if (!tenantId) {
+                return;
+            }
+
+            const response = await fetch('@Url.Action("MembrosPorTenant", "User")?tenantId=' + encodeURIComponent(tenantId));
+            if (!response.ok) {
+                membroSelect.disabled = true;
+                return;
+            }
+
+            const membros = await response.json();
+            membros.forEach(function (membro) {
+                const option = document.createElement('option');
+                option.value = membro.id;
+                option.textContent = membro.nome;
+                membroSelect.appendChild(option);
+            });
+
+            membroSelect.disabled = false;
+        });
+    </script>
+}

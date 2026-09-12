@@ -36,7 +36,11 @@
 
     <div class="form-group mb-3">
         <label asp-for="Valor" class="form-label"></label>
-        <input asp-for="Valor" class="form-control" type="number" step="0.01" min="0" />
+        <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input asp-for="Valor" class="form-control" type="text" inputmode="decimal"
+                     placeholder="0,00" autocomplete="off" data-currency-input data-val="false" />
+        </div>
         <span asp-validation-for="Valor" class="text-danger"></span>
     </div>
 
@@ -55,4 +59,28 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const valorInput = document.querySelector('[data-currency-input]');
+
+        function formatarValor(valor) {
+            const digitos = valor.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+            if (!digitos) {
+                return '';
+            }
+
+            return (Number(digitos) / 100).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        valorInput.addEventListener('input', function () {
+            this.value = formatarValor(this.value);
+        });
+
+        valorInput.form.addEventListener('submit', function () {
+            valorInput.value = valorInput.value.replace(/\./g, '');
+        });
+    </script>
 }

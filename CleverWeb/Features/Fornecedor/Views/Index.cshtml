@@ -1,0 +1,69 @@
+@model IEnumerable<CleverWeb.Features.Fornecedor.ViewModels.FornecedorViewModel>
+
+@{
+    ViewData["Title"] = "Fornecedores";
+}
+
+<div class="page-shell">
+    <div class="section-header">
+        <div>
+            <div class="section-header__eyebrow"><i class="bi bi-person-vcard"></i> Cadastro financeiro</div>
+            <h1 class="page-title">Fornecedores</h1>
+            <p class="section-header__description">Gerencie as origens das despesas da igreja.</p>
+        </div>
+        <div class="toolbar">
+            <a asp-action="Create" class="btn btn-primary btn-icon">
+                <i class="bi bi-plus-lg me-1"></i> Novo fornecedor
+            </a>
+        </div>
+    </div>
+
+    <div class="card-panel">
+        <div class="card-panel__header">
+            <strong>Fornecedores cadastrados</strong>
+            <span class="card-panel__meta">@Model.Count() @(Model.Count() == 1 ? "fornecedor" : "fornecedores")</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table data-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Fornecedor</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var fornecedor in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="record-name">
+                                    <span class="record-name__icon"><i class="bi bi-person-vcard"></i></span>
+                                    <span class="record-name__title">@fornecedor.Descricao</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a asp-action="Edit" asp-route-id="@fornecedor.Id" class="btn btn-sm btn-warning btn-icon" title="Editar fornecedor">
+                                        <i class="bi bi-pencil-square"></i><span class="d-none d-md-inline">Editar</span>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@fornecedor.Id" method="post" class="d-inline" onsubmit="return confirm('Deseja realmente excluir este fornecedor?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Excluir fornecedor">
+                                            <i class="bi bi-trash3"></i><span class="d-none d-md-inline">Excluir</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="2" class="table-empty"><i class="bi bi-person-vcard"></i>Nenhum fornecedor cadastrado ainda.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
