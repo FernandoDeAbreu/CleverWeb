@@ -13,6 +13,12 @@ namespace CleverWeb.Features.Tenant.ViewModels
         [Display(Name = "Slug")]
         public string Slug { get; set; } = string.Empty;
 
+        [Display(Name = "Endereço da igreja")]
+        public string Endereco { get; set; } = string.Empty;
+
+        [Display(Name = "Pastor congregacional")]
+        public string PastorCongregacional { get; set; } = string.Empty;
+
         [Display(Name = "Ativo")]
         public bool Ativo { get; set; } = true;
     }

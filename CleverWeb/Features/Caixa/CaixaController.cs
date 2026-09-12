@@ -3,6 +3,7 @@ using CleverWeb.Features.Caixa.Services;
 using CleverWeb.Features.Contribuicao.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CleverWeb.Features.Caixa
 {
@@ -56,6 +57,27 @@ namespace CleverWeb.Features.Caixa
             var vm = _caixaService.ObterDados(Id);
             var pdf = _caixaService.ExportarPdf(vm);
             return File(pdf, "application/pdf", "Contribuicoes.pdf");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelarFechamento(int id, string? motivoCancelamento)
+        {
+            try
+            {
+                var usuarioId = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var idUsuario)
+                    ? idUsuario
+                    : (int?)null;
+
+                await _caixaService.CancelarFechamento(id, motivoCancelamento, usuarioId);
+                TempData["MensagemSucesso"] = "Fechamento cancelado com sucesso.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["MensagemErro"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Movimento), new { id });
         }
 
         [HttpPost]

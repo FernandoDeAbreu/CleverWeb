@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CleverWeb.Data;
+using CleverWeb.Features.Caixa.Services;
 using CleverWeb.Features.Contribuicao.Services;
 using CleverWeb.Features.Contribuicao.ViewModels;
 using CleverWeb.Features.Membro.ViewModels;
@@ -20,13 +21,15 @@ namespace CleverWeb.Features.Contribuicao
         private readonly ContribuicaoService _contribuicaoService;
         private readonly IMapper _mapper;
         private readonly ITenantAccessor _tenantAccessor;
+        private readonly CaixaService _caixaService;
 
-        public ContribuicaoController(ContribuicaoService contribuicaoService, CleverDbContext db, IMapper mapper, ITenantAccessor tenantAccessor)
+        public ContribuicaoController(ContribuicaoService contribuicaoService, CleverDbContext db, IMapper mapper, ITenantAccessor tenantAccessor, CaixaService caixaService)
         {
             _contribuicaoService = contribuicaoService;
             _db = db;
             _mapper = mapper;
             _tenantAccessor = tenantAccessor;
+            _caixaService = caixaService;
         }
    
         public async Task<IActionResult> Index()
@@ -93,6 +96,7 @@ namespace CleverWeb.Features.Contribuicao
 
             _db.Contribuicao.Add(contribuicao);
             await _db.SaveChangesAsync();
+            await _caixaService.AtualizarSaldoAtual(contribuicao.TipoContribuicao, contribuicao.Valor);
 
             return RedirectToAction("Comprovante", new { id = contribuicao.Id });
         }
@@ -107,43 +111,26 @@ namespace CleverWeb.Features.Contribuicao
             return View(vm);
         }
 
-        public async Task<IActionResult> Edit(int id)
-        {
-            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
-            var contribuicao = await _db.Contribuicao.FirstOrDefaultAsync(c => c.Id == id && c.TenantId == tenantId); 
-
-            if (contribuicao == null)
-                return NotFound();
-
-            ViewBag.MembroId = contribuicao.MembroId;
-
-            var vm = _mapper.Map<ContribuicaoViewModel>(contribuicao);
-            return View(vm);
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ContribuicaoViewModel model)
+        public async Task<IActionResult> Estornar(int id, string? motivoExclusao)
         {
-            if (id != model.Id)
-                return BadRequest();
+            if (string.IsNullOrWhiteSpace(motivoExclusao) || motivoExclusao.Trim().Length < 15)
+            {
+                TempData["Error"] = "O motivo do estorno deve ser informado e conter no mínimo 15 caracteres.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
 
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
-            var entidade = await _db.Contribuicao.FirstOrDefaultAsync(c => c.Id == id && c.TenantId == tenantId);
-           
-            if (entidade == null)
-                return NotFound();
-
-            model.DataExclusao = DateTime.Now;
-
-            _mapper.Map(model, entidade);
-
-            await _db.SaveChangesAsync();
-
-            TempData["Success"] = "Contribuicao atualizado com sucesso!";
+            try
+            {
+                await _contribuicaoService.Estornar(id, motivoExclusao);
+                TempData["Success"] = "Contribuição estornada com sucesso.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction(nameof(Details), new { id });
+            }
 
             return RedirectToAction(nameof(Index));
         }

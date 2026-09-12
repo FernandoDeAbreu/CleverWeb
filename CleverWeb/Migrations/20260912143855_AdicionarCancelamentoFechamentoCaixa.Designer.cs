@@ -3,6 +3,7 @@ using System;
 using CleverWeb.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleverWeb.Migrations
 {
     [DbContext(typeof(CleverDbContext))]
-    partial class CleverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260912143855_AdicionarCancelamentoFechamentoCaixa")]
+    partial class AdicionarCancelamentoFechamentoCaixa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.22");
@@ -226,17 +229,9 @@ namespace CleverWeb.Migrations
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Endereco")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PastorCongregacional")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Slug")

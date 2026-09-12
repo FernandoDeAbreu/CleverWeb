@@ -10,11 +10,15 @@ namespace CleverWeb.Data.Reports
     {
         private readonly RelatorioContribuicaoViewModel _ralatorio;
         private readonly string _tenantName;
+        private readonly string _tenantAddress;
+        private readonly string _pastorName;
 
-        public RelatorioTemploCentral(RelatorioContribuicaoViewModel ralatorio, string tenantName)
+        public RelatorioTemploCentral(RelatorioContribuicaoViewModel ralatorio, string tenantName, string tenantAddress, string pastorName)
         {
             _ralatorio = ralatorio;
             _tenantName = tenantName;
+            _tenantAddress = tenantAddress;
+            _pastorName = pastorName;
         }
 
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
@@ -56,7 +60,7 @@ namespace CleverWeb.Data.Reports
                      .Text($" Movimento do caixa de {_ralatorio.Filtro.TipoContribuicao} no período {_ralatorio.Filtro.DataInicio:dd/MM/yyyy} à {_ralatorio.Filtro.DataFim:dd/MM/yyyy} ").FontSize(12).Bold().ParagraphSpacing(10);
                     col.Item()
                      .BorderRight(0.5f)
-                     .BorderLeft(0.5f).Text($" Congregação: {_tenantName} | Endereço: Rua - Centro - Açailândia-MA").FontSize(12);
+                     .BorderLeft(0.5f).Text($" Congregação: {_tenantName} | {_tenantAddress} ").FontSize(12);
                     col.Item()
                      .BorderRight(0.5f)
                      .BorderLeft(0.5f)
@@ -131,7 +135,7 @@ namespace CleverWeb.Data.Reports
                 });
         }
 
-        private static void ComposeFooter(IContainer container)
+        private void ComposeFooter(IContainer container)
         {
             container.Table(table =>
                 {
@@ -141,7 +145,7 @@ namespace CleverWeb.Data.Reports
                         columns.RelativeColumn(1); // Descrição
                     });
 
-                    table.Cell().ColumnSpan(1).Border(0.5f).Text($"  Pastor congregacional");
+                    table.Cell().ColumnSpan(1).Border(0.5f).Text($"  {_pastorName}");
                     table.Cell().ColumnSpan(1).Border(0.5f).Text($"  Visto");
                     table.Cell().ColumnSpan(1).Border(0.5f).Text($"  Tesoureiro");
                     table.Cell().ColumnSpan(1).Border(0.5f).Text($"  Visto");

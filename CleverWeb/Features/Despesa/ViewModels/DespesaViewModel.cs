@@ -8,6 +8,7 @@ namespace CleverWeb.Features.Despesa.ViewModels
     public class DespesaViewModel
     {
         public int Id { get; set; }
+        public int CaixaId { get; set; }
 
         [Display(Name = "Descrição")]
         public string Descricao { get; set; } = string.Empty;
@@ -35,6 +36,7 @@ namespace CleverWeb.Features.Despesa.ViewModels
 
         public DateTime DataExclusao { get; set; }
 
+        [Display(Name = "Motivo do estorno")]
         public string? MotivoExclusao { get; set; }
     }
 }

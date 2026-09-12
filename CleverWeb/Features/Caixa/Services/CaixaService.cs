@@ -141,6 +141,94 @@ namespace CleverWeb.Features.Caixa.Services
                 await FecharCaixaMissao(relatorio);
         }
 
+        public async Task AtualizarSaldoAtual(Data.Shared.Enums.TipoContribuicao tipo, decimal variacao)
+        {
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var caixaAtual = await _context.Caixa
+                .Where(c => c.TenantId == tenantId
+                    && c.TipoContribuicao == tipo
+                    && !c.Cancelado)
+                .OrderByDescending(c => c.Id)
+                .FirstOrDefaultAsync();
+
+            if (caixaAtual == null)
+                return;
+
+            caixaAtual.SaldoAtual += variacao;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task CancelarFechamento(int id, string? motivoCancelamento, int? usuarioId)
+        {
+            var motivo = motivoCancelamento?.Trim();
+            if (string.IsNullOrWhiteSpace(motivo) || motivo.Length < 15)
+                throw new InvalidOperationException("O motivo do cancelamento deve ser informado e conter no mínimo 15 caracteres.");
+
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var caixa = await _context.Caixa
+                .FirstOrDefaultAsync(c => c.Id == id && c.TenantId == tenantId);
+
+            if (caixa == null)
+                throw new InvalidOperationException("Fechamento não encontrado.");
+
+            if (caixa.Cancelado)
+                throw new InvalidOperationException("Este fechamento já foi cancelado.");
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            var valorEstornado = caixa.SaldoAtual - caixa.SaldoAnterior;
+
+            var contribuicoes = await _context.Contribuicao
+                .Where(c => c.CaixaID == id && c.TenantId == tenantId)
+                .ToListAsync();
+
+            foreach (var contribuicao in contribuicoes)
+                contribuicao.CaixaID = 0;
+
+            var despesas = await _context.Despesa
+                .Where(d => d.CaixaId == id && d.TenantId == tenantId)
+                .ToListAsync();
+
+            var despesasAutomaticas = despesas.Where(EhDespesaAutomatica).ToList();
+            _context.Despesa.RemoveRange(despesasAutomaticas);
+
+            foreach (var despesa in despesas.Except(despesasAutomaticas))
+                despesa.CaixaId = 0;
+
+            caixa.SaldoAtual = caixa.SaldoAnterior;
+            caixa.Cancelado = true;
+            caixa.DtCancelamento = DateTime.Now;
+            caixa.UsuarioCancelamentoId = usuarioId;
+            caixa.MotivoCancelamento = motivo;
+
+            if (valorEstornado != 0)
+            {
+                var fechamentosPosteriores = await _context.Caixa
+                    .Where(c => c.TenantId == tenantId
+                        && c.TipoContribuicao == caixa.TipoContribuicao
+                        && c.Id > caixa.Id
+                        && !c.Cancelado)
+                    .ToListAsync();
+
+                foreach (var fechamentoPosterior in fechamentosPosteriores)
+                {
+                    fechamentoPosterior.SaldoAnterior -= valorEstornado;
+                    fechamentoPosterior.SaldoAtual -= valorEstornado;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+
+        private static bool EhDespesaAutomatica(Models.Despesa despesa)
+        {
+            return despesa.GeradaNoFechamento
+                || despesa.Descricao.StartsWith("10% - Saída para convenção", StringComparison.OrdinalIgnoreCase)
+                || despesa.Descricao.StartsWith("40% - Saída para sede", StringComparison.OrdinalIgnoreCase)
+                || despesa.Descricao.StartsWith("30% - Auxílo eclesiástico", StringComparison.OrdinalIgnoreCase)
+                || despesa.Descricao.StartsWith("Secretaria de missões IEADA", StringComparison.OrdinalIgnoreCase);
+        }
+
         private async Task FecharCaixaOferta(RelatorioMovimentoCaixaViewModel relatorio)
         {
             var receitas = relatorio.Lista.Where(c => c.Tipo == "Entrada");
@@ -217,7 +305,8 @@ namespace CleverWeb.Features.Caixa.Services
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Dízimo,
                 Descricao = "10% - Saída para convenção",
                 Valor = valor,
-                FornecedorId = 9
+                FornecedorId = 9,
+                GeradaNoFechamento = true
             };
             await _context.Despesa.AddAsync(depesa);
             await _context.SaveChangesAsync();
@@ -237,7 +326,8 @@ namespace CleverWeb.Features.Caixa.Services
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Dízimo,
                 Descricao = "40% - Saída para sede",
                 Valor = valor,
-                FornecedorId = 9
+                FornecedorId = 9,
+                GeradaNoFechamento = true
             };
             await _context.Despesa.AddAsync(depesa);
             await _context.SaveChangesAsync();
@@ -257,7 +347,8 @@ namespace CleverWeb.Features.Caixa.Services
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Dízimo,
                 Descricao = "30% - Auxílo eclesiástico",
                 Valor = valor,
-                FornecedorId = 9
+                FornecedorId = 9,
+                GeradaNoFechamento = true
             };
             await _context.Despesa.AddAsync(depesa);
             await _context.SaveChangesAsync();
@@ -277,7 +368,8 @@ namespace CleverWeb.Features.Caixa.Services
                 CaixaSaida = Data.Shared.Enums.TipoContribuicao.Missão,
                 Descricao = "Secretaria de missões IEADA",
                 Valor = valor,
-                FornecedorId = 9
+                FornecedorId = 9,
+                GeradaNoFechamento = true
             };
             await _context.Despesa.AddAsync(depesa);
             await _context.SaveChangesAsync();
@@ -301,9 +393,27 @@ namespace CleverWeb.Features.Caixa.Services
             var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
             var despesas = relatorio.Lista.Where(c => c.Tipo == "Saída").Sum(c => c.Valor) * -1;
 
-            var ultimoCaixa = await _context.Caixa.Where(c => c.TipoContribuicao == relatorio.Filtro.TipoContribuicao && c.TenantId == tenantId)
+            var ultimoCaixa = await _context.Caixa.Where(c => c.TipoContribuicao == relatorio.Filtro.TipoContribuicao && c.TenantId == tenantId && !c.Cancelado)
                               .OrderByDescending(x => x.Id)
                               .FirstOrDefaultAsync() ?? new Models.Caixa();
+
+            var saldoAtual = (saldoReceita - despesas) + ultimoCaixa.SaldoAtual;
+            var saldoAnterior = ultimoCaixa.SaldoAtual;
+
+            if (ultimoCaixa.Id > 0)
+            {
+                var variacaoLancamentos = relatorio.Lista.Sum(c => c.Valor);
+                saldoAnterior = ultimoCaixa.SaldoAtual - variacaoLancamentos;
+                saldoAtual = ultimoCaixa.SaldoAtual;
+
+                if (relatorio.Filtro.TipoContribuicao == Data.Shared.Enums.TipoContribuicao.Dízimo)
+                {
+                    var dizimos = relatorio.Lista
+                        .Where(c => c.Tipo == "Entrada" && c.TipoContribuicao == Data.Shared.Enums.TipoContribuicao.Dízimo)
+                        .Sum(c => c.Valor);
+                    saldoAtual -= dizimos * 80 / 100;
+                }
+            }
 
             var caixa = new Models.Caixa
             {
@@ -311,8 +421,8 @@ namespace CleverWeb.Features.Caixa.Services
                 DtFechamento = DateTime.Now,
                 DtInicial = relatorio.Filtro.DataInicio ?? DateTime.Now,
                 DtFinal = relatorio.Filtro.DataFim ?? DateTime.Now,
-                SaldoAtual = (saldoReceita - despesas) + ultimoCaixa.SaldoAtual,
-                SaldoAnterior = ultimoCaixa.SaldoAtual,
+                SaldoAtual = saldoAtual,
+                SaldoAnterior = saldoAnterior,
                 TipoContribuicao = relatorio.Filtro.TipoContribuicao,
                 UsuarioId = 1,
             };
@@ -327,8 +437,12 @@ namespace CleverWeb.Features.Caixa.Services
         public byte[] ExportarPdf(RelatorioMovimentoCaixaViewModel relatorioContribuicao)
         {
             var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
-            var tenantName = _context.Tenant.FirstOrDefault(t => t.Id == tenantId)?.Nome ?? "Tenant";
-            var document = new RelatorioTemploCentralMovimentoCaixa(relatorioContribuicao, tenantName);
+            var tenant = _context.Tenant.FirstOrDefault(t => t.Id == tenantId);
+            var document = new RelatorioTemploCentralMovimentoCaixa(
+                relatorioContribuicao,
+                tenant?.Nome ?? "Tenant",
+                tenant?.Endereco ?? string.Empty,
+                tenant?.PastorCongregacional ?? string.Empty);
 
             var pdfBytes = document.GeneratePdf();
 

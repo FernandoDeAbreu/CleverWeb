@@ -5,37 +5,119 @@
 @{
     ViewData["Title"] = @ViewBag.Membro;
 }
-<h2 class="mb-3">
-    @ViewBag.Membro
-</h2>
+<div class="page-shell">
+    <header class="section-header">
+        <div>
+            <div class="section-header__eyebrow">
+                <i class="bi bi-graph-up-arrow"></i>
+                <span>Financeiro</span>
+            </div>
+            <h1 class="page-title">Detalhes da contribuição</h1>
+            <p class="section-header__description">Confira o lançamento e as ações disponíveis.</p>
+        </div>
+    </header>
 
-<div class="">
-    <div class="">
-        <dl class="">
-            <dt class="col-sm-3">Tipo de Contribuição</dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.TipoContribuicao)
-            </dd>
+    @if (TempData["Success"] is string sucesso)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-1"></i> @sucesso
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
 
-            <dt class="col-sm-3">Forma de Pagamento</dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.FormaPagto)
-            </dd>
+    @if (TempData["Error"] is string erro)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-1"></i> @erro
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
 
-            <dt class="col-sm-3">Valor</dt>
-            <dd class="col-sm-9">
-                @Model.Valor.ToString("C", CultureInfo.GetCultureInfo("pt-BR"))
-            </dd>
+    <section class="card-panel">
+        <div class="card-panel__header">
+            <div class="record-name">
+                <span class="record-name__icon"><i class="bi bi-person"></i></span>
+                <div>
+                    <span class="record-name__title">@ViewBag.Membro</span>
+                    <span class="record-name__subtitle">@Model.TipoContribuicao · @Model.FormaPagto</span>
+                </div>
+            </div>
+        </div>
 
-            <dt class="col-sm-3">Data de Pagamento</dt>
-            <dd class="col-sm-9">
-                @Model.DataPagamento.ToString("dd/MM/yyyy")
-            </dd>
-        </dl>
+        <div class="card-body detail-list">
+            <dl class="row mb-0">
+                <div class="detail-list__item">
+                    <dt>Valor</dt>
+                    <dd class="text-success fw-bold">@Model.Valor.ToString("C", CultureInfo.GetCultureInfo("pt-BR"))</dd>
+                </div>
+                <div class="detail-list__item">
+                    <dt>Data de pagamento</dt>
+                    <dd>@Model.DataPagamento.ToString("dd/MM/yyyy")</dd>
+                </div>
+                @if (Model.CaixaID > 0)
+                {
+                    <div class="detail-list__item">
+                        <dt>Status do caixa</dt>
+                        <dd class="text-secondary"><i class="bi bi-lock-fill me-1"></i> Pertence a um caixa fechado</dd>
+                    </div>
+                }
+            </dl>
+        </div>
+
+        <div class="card-panel__footer d-flex justify-content-between gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
+            @if (Model.CaixaID > 0)
+            {
+                <button type="button" class="btn btn-outline-secondary" disabled title="Não é possível estornar lançamentos de caixas fechados">
+                    <i class="bi bi-lock-fill me-1"></i> Estorno bloqueado
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#estornarContribuicaoModal">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Estornar
+                </button>
+            }
+        </div>
+    </section>
+</div>
+
+@if (Model.CaixaID == 0)
+{
+<div class="modal fade" id="estornarContribuicaoModal" tabindex="-1" aria-labelledby="estornarContribuicaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0">
+                <div>
+                    <h5 class="modal-title fw-bold" id="estornarContribuicaoModalLabel">Estornar contribuição?</h5>
+                    <small class="text-muted">Esta ação será registrada para auditoria.</small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <form asp-action="Estornar" asp-controller="Contribuicao" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        O valor de @Model.Valor.ToString("C", CultureInfo.GetCultureInfo("pt-BR")) será retirado do saldo atual, se o lançamento estiver aberto.
+                    </div>
+
+                    <label for="motivoExclusao" class="form-label fw-semibold">Motivo <span class="text-danger">*</span></label>
+                    <textarea id="motivoExclusao" name="MotivoExclusao" class="form-control" rows="4" minlength="15" maxlength="500" required placeholder="Informe o motivo do estorno (mínimo de 15 caracteres)"></textarea>
+                    <div class="form-text">Informe pelo menos 15 caracteres.</div>
+                </div>
+
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Voltar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-check-circle me-1"></i> Confirmar estorno
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-
-<div class="container-fluid d-flex justify-content-between align-items-center align-baseline mt-3">
-    <a asp-action="Index" asp-controller="Contribuicao" class="btn btn-secondary me-2">Voltar</a>
-    <a asp-action="Edit" asp-controller="Contribuicao" asp-route-id="@Model.Id" class="btn btn-danger">Extornar</a>
-</div>
+}

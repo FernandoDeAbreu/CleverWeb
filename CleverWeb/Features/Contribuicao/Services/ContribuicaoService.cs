@@ -55,16 +55,64 @@ namespace CleverWeb.Features.Contribuicao.Services
                 .Include(c => c.Membro)
                 .FirstAsync(c => c.Id == id);
 
-            var tenantName = _db.Tenant.FirstOrDefault(t => t.Id == tenantId)?.Nome ?? "Tenant";
-            var document = new ReciboContribuicaoReport(contribuicao, tenantName);
+            var tenant = _db.Tenant.FirstOrDefault(t => t.Id == tenantId);
+            var document = new ReciboContribuicaoReport(
+                contribuicao,
+                tenant?.Nome ?? "Tenant",
+                tenant?.Endereco ?? string.Empty,
+                tenant?.PastorCongregacional ?? string.Empty);
             return document.GeneratePdf();
+        }
+
+        public async Task Estornar(int id, string? motivo)
+        {
+            var motivoNormalizado = motivo?.Trim();
+            if (string.IsNullOrWhiteSpace(motivoNormalizado) || motivoNormalizado.Length < 15)
+                throw new InvalidOperationException("O motivo do estorno deve ser informado e conter no mínimo 15 caracteres.");
+
+            var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
+            var contribuicao = await _db.Contribuicao
+                .FirstOrDefaultAsync(c => c.Id == id && c.TenantId == tenantId);
+
+            if (contribuicao == null)
+                throw new InvalidOperationException("Contribuição não encontrada.");
+
+            if (!string.IsNullOrWhiteSpace(contribuicao.MotivoExclusao))
+                throw new InvalidOperationException("Esta contribuição já foi estornada.");
+
+            if (contribuicao.CaixaID > 0)
+                throw new InvalidOperationException("Não é possível estornar uma contribuição vinculada a um caixa já fechado. Cancele o fechamento do caixa primeiro.");
+
+            await using var transaction = await _db.Database.BeginTransactionAsync();
+
+            var caixa = contribuicao.CaixaID > 0
+                ? await _db.Caixa.FirstOrDefaultAsync(c => c.Id == contribuicao.CaixaID && c.TenantId == tenantId)
+                : await _db.Caixa
+                    .Where(c => c.TenantId == tenantId
+                        && c.TipoContribuicao == contribuicao.TipoContribuicao
+                        && !c.Cancelado)
+                    .OrderByDescending(c => c.Id)
+                    .FirstOrDefaultAsync();
+
+            if (caixa != null && !caixa.Cancelado)
+                caixa.SaldoAtual -= contribuicao.Valor;
+
+            contribuicao.MotivoExclusao = motivoNormalizado;
+            contribuicao.DataExclusao = DateTime.Now;
+
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
         }
 
         public byte[] ExportarPdf(RelatorioContribuicaoViewModel relatorioContribuicao)
         {
             var tenantId = _tenantAccessor.CurrentTenantId ?? 0;
-            var tenantName = _db.Tenant.FirstOrDefault(t => t.Id == tenantId)?.Nome ?? "Tenant";
-            var document = new RelatorioTemploCentral(relatorioContribuicao, tenantName);
+            var tenant = _db.Tenant.FirstOrDefault(t => t.Id == tenantId);
+            var document = new RelatorioTemploCentral(
+                relatorioContribuicao,
+                tenant?.Nome ?? "Tenant",
+                tenant?.Endereco ?? string.Empty,
+                tenant?.PastorCongregacional ?? string.Empty);
 
             var pdfBytes = document.GeneratePdf();
 

@@ -1,0 +1,76 @@
+@using System.Globalization
+@model CleverWeb.Features.Despesa.ViewModels.DespesaViewModel
+
+@{
+    ViewData["Title"] = "Detalhes da despesa";
+}
+
+<div class="page-shell">
+    <header class="section-header">
+        <div>
+            <div class="section-header__eyebrow">
+                <i class="bi bi-receipt"></i>
+                <span>Financeiro</span>
+            </div>
+            <h1 class="page-title">Detalhes da despesa</h1>
+            <p class="section-header__description">Confira o lançamento e escolha uma ação.</p>
+        </div>
+    </header>
+
+    <section class="card-panel">
+        <div class="card-panel__header">
+            <div class="record-name">
+                <span class="record-name__icon"><i class="bi bi-graph-down-arrow"></i></span>
+                <div>
+                    <span class="record-name__title">@Model.Fornecedor?.Descricao</span>
+                    <span class="record-name__subtitle">@Model.Descricao</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body detail-list">
+            <dl class="row mb-0">
+                <div class="detail-list__item">
+                    <dt>Descrição</dt>
+                    <dd>@Model.Descricao</dd>
+                </div>
+                <div class="detail-list__item">
+                    <dt>Valor</dt>
+                    <dd class="text-danger fw-bold">@Model.Valor.ToString("C", CultureInfo.GetCultureInfo("pt-BR"))</dd>
+                </div>
+                <div class="detail-list__item">
+                    <dt>Tipo de caixa</dt>
+                    <dd>@Model.CaixaSaida</dd>
+                </div>
+                <div class="detail-list__item">
+                    <dt>Data de pagamento</dt>
+                    <dd>@Model.DataPagamento.ToString("dd/MM/yyyy")</dd>
+                </div>
+
+                @if (Model.CaixaId > 0)
+                {
+                    <div class="detail-list__item">
+                        <dt>Status do caixa</dt>
+                        <dd class="text-secondary"><i class="bi bi-lock-fill me-1"></i> Pertence a um caixa fechado</dd>
+                    </div>
+                }
+            </dl>
+        </div>
+
+        <div class="card-panel__footer d-flex justify-content-between gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
+            @if (Model.CaixaId > 0)
+            {
+                <button type="button" class="btn btn-outline-secondary" disabled title="Não é possível estornar lançamentos de caixas fechados">
+                    <i class="bi bi-lock-fill me-1"></i> Estorno bloqueado
+                </button>
+            }
+            else
+            {
+                <a asp-action="Estornar" asp-route-id="@Model.Id" class="btn btn-danger">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Estornar
+                </a>
+            }
+        </div>
+    </section>
+</div>

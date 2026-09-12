@@ -12,5 +12,8 @@ namespace CleverWeb.Features.Caixa.ViewModels
         public decimal SaldoAnterior { get; set; }
         public TipoContribuicao? TipoContribuicao { get; set; }
         public int UsuarioId { get; set; }
+        public bool Cancelado { get; set; }
+        public DateTime? DtCancelamento { get; set; }
+        public string? MotivoCancelamento { get; set; }
     }
 }

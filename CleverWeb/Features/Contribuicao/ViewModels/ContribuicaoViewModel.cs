@@ -8,6 +8,7 @@ namespace CleverWeb.Features.Contribuicao.ViewModels
     {
         public int Id { get; set; }
         public int MembroId { get; set; }
+        public int CaixaID { get; set; }
 
         public Models.Membro? Membro { get; set; }
 
@@ -29,7 +30,7 @@ namespace CleverWeb.Features.Contribuicao.ViewModels
 
         public DateTime DataExclusao { get; set; }
 
-        [Display(Name = "Motivo do extorno")]
+        [Display(Name = "Motivo do estorno")]
         public string? MotivoExclusao { get; set; }
     }
 }

@@ -25,5 +25,6 @@ namespace CleverWeb.Models
         public string? MotivoExclusao { get; set; }
 
         public int CaixaId { get; set; }
+        public bool GeradaNoFechamento { get; set; }
     }
 }

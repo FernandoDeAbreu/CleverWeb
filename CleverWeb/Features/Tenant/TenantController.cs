@@ -62,6 +62,8 @@ namespace CleverWeb.Features.Tenant
             {
                 Nome = nome,
                 Slug = slug,
+                Endereco = model.Endereco.Trim(),
+                PastorCongregacional = model.PastorCongregacional.Trim(),
                 Ativo = model.Ativo,
                 DataCriacao = DateTime.UtcNow
             };
@@ -87,6 +89,8 @@ namespace CleverWeb.Features.Tenant
             {
                 Nome = tenant.Nome,
                 Slug = tenant.Slug,
+                Endereco = tenant.Endereco,
+                PastorCongregacional = tenant.PastorCongregacional,
                 Ativo = tenant.Ativo
             });
         }
@@ -114,6 +118,8 @@ namespace CleverWeb.Features.Tenant
 
             tenant.Nome = model.Nome.Trim();
             tenant.Slug = slug;
+            tenant.Endereco = model.Endereco.Trim();
+            tenant.PastorCongregacional = model.PastorCongregacional.Trim();
             tenant.Ativo = model.Ativo;
             _db.SaveChanges();
 

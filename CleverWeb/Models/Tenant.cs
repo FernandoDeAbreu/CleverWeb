@@ -5,6 +5,8 @@ namespace CleverWeb.Models
         public int Id { get; set; }
         public string Nome { get; set; } = string.Empty;
         public string Slug { get; set; } = string.Empty;
+        public string Endereco { get; set; } = string.Empty;
+        public string PastorCongregacional { get; set; } = string.Empty;
         public bool Ativo { get; set; } = true;
         public DateTime DataCriacao { get; set; } = DateTime.UtcNow;
 

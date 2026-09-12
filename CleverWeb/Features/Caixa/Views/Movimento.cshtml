@@ -9,6 +9,22 @@
 }
 
 <div class="container py-4">
+    @if (TempData["MensagemSucesso"] is string mensagemSucesso)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-1"></i> @mensagemSucesso
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
+
+    @if (TempData["MensagemErro"] is string mensagemErro)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-1"></i> @mensagemErro
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
+
     <div class="d-flex align-items-center mb-4">
         <i class="bi bi-clipboard-data fs-3 text-primary me-2"></i>
         <h2 class="mb-0 fw-bold">Movimento do caixa</h2>
@@ -65,6 +81,23 @@
                     </div>
                 </div>
             </div>
+
+            @if (Model.Caixa.Cancelado)
+            {
+                <div class="alert alert-secondary mt-3 mb-0">
+                    <div class="fw-semibold"><i class="bi bi-slash-circle me-1"></i>Fechamento cancelado</div>
+                    <small>
+                        @if (Model.Caixa.DtCancelamento.HasValue)
+                        {
+                            <span>Em @Model.Caixa.DtCancelamento.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Model.Caixa.MotivoCancelamento))
+                        {
+                            <span> · @Model.Caixa.MotivoCancelamento</span>
+                        }
+                    </small>
+                </div>
+            }
         </div>
     </div>
 
@@ -104,10 +137,72 @@
     </div>
 </div>
 
+@if (!Model.Caixa.Cancelado)
+{
+    <button type="button"
+            class="btn btn-outline-danger rounded-circle fab-action fab-cancel-action"
+            data-bs-toggle="modal"
+            data-bs-target="#cancelarFechamentoModal"
+            aria-label="Cancelar fechamento"
+            title="Cancelar fechamento">
+        <i class="bi bi-arrow-counterclockwise"></i>
+    </button>
+
+    <div class="modal fade" id="cancelarFechamentoModal" tabindex="-1" aria-labelledby="cancelarFechamentoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0">
+                    <div>
+                        <h5 class="modal-title fw-bold" id="cancelarFechamentoModalLabel">Cancelar fechamento?</h5>
+                        <small class="text-muted">Os lançamentos serão reabertos para um novo fechamento.</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+
+                <form asp-action="CancelarFechamento" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Caixa.Id" />
+
+                    <div class="modal-body">
+                        <div class="bg-light rounded-3 p-3 mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Tipo</span>
+                                <strong>@Model.Caixa.TipoContribuicao</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span class="text-muted">Saldo atual</span>
+                                <strong>@Model.Caixa.SaldoAtual.ToString("C", new CultureInfo("pt-BR"))</strong>
+                            </div>
+                        </div>
+
+                        <label for="motivoCancelamento" class="form-label fw-semibold">Motivo <span class="text-danger">*</span></label>
+                        <textarea id="motivoCancelamento"
+                                  name="motivoCancelamento"
+                                  class="form-control"
+                                  rows="3"
+                                  minlength="15"
+                                  maxlength="500"
+                                  required
+                                  placeholder="Informe o motivo do cancelamento (mínimo de 15 caracteres)"></textarea>
+                        <div class="form-text">Informe pelo menos 15 caracteres.</div>
+                    </div>
+
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Voltar</button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Confirmar cancelamento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
 <a asp-controller="Caixa"
    asp-action="ExportarPdf"
    asp-route-id="@Model.Filtro.CaixaId"
-   class="btn btn-danger rounded-circle fab-action"
+    class="btn btn-danger rounded-circle fab-action fab-report-action"
    aria-label="Gerar relatório"
    title="Gerar relatório">
     <i class="bi bi-file-earmark-pdf"></i>
@@ -126,5 +221,21 @@
         font-size: 1.4rem;
         box-shadow: 0 10px 25px rgba(220, 53, 69, 0.35);
         z-index: 1030;
+    }
+
+    .fab-cancel-action {
+        bottom: 154px;
+        background: #fff;
+        color: #dc3545;
+    }
+
+    .fab-cancel-action:hover,
+    .fab-cancel-action:focus-visible {
+        color: #b02a37;
+        background: #fff;
+    }
+
+    .fab-report-action {
+        bottom: 90px;
     }
 </style>

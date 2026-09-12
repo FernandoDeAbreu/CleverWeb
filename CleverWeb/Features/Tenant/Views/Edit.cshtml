@@ -33,6 +33,18 @@
                 <span asp-validation-for="Slug" class="text-danger"></span>
             </div>
 
+            <div class="mb-3">
+                <label asp-for="Endereco" class="form-label"></label>
+                <input asp-for="Endereco" class="form-control" maxlength="250" />
+                <span asp-validation-for="Endereco" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PastorCongregacional" class="form-label"></label>
+                <input asp-for="PastorCongregacional" class="form-control" maxlength="150" />
+                <span asp-validation-for="PastorCongregacional" class="text-danger"></span>
+            </div>
+
             <div class="mb-3 form-check">
                 <input asp-for="Ativo" class="form-check-input" />
                 <label asp-for="Ativo" class="form-check-label"></label>

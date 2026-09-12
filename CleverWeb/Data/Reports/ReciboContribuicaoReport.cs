@@ -10,11 +10,15 @@ namespace CleverWeb.Data.Reports
     {
         private readonly Contribuicao _contribuicao;
         private readonly string _tenantName;
+        private readonly string _tenantAddress;
+        private readonly string _pastorName;
 
-        public ReciboContribuicaoReport(Contribuicao contribuicao, string tenantName)
+        public ReciboContribuicaoReport(Contribuicao contribuicao, string tenantName, string tenantAddress, string pastorName)
         {
             _contribuicao = contribuicao;
             _tenantName = tenantName;
+            _tenantAddress = tenantAddress;
+            _pastorName = pastorName;
         }
 
         public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
@@ -50,7 +54,7 @@ namespace CleverWeb.Data.Reports
                  .BorderLeft(0.5f).Text($" Congregação: {_tenantName} ").FontSize(12);
                 col.Item()
                  .BorderRight(0.5f)
-                 .BorderLeft(0.5f).Text(" Endereço: Rua - Centro - Açailândia-MA").FontSize(12);
+                 .BorderLeft(0.5f).Text($" {_tenantAddress} ").FontSize(12);
                 col.Item()
                  .BorderRight(0.5f)
                  .BorderLeft(0.5f)
@@ -84,7 +88,7 @@ namespace CleverWeb.Data.Reports
                     .Italic();
 
                 col.Spacing(20);
-                col.Item().BorderTop(0.5f).Text("Pastor Congregacional").AlignCenter()
+                col.Item().BorderTop(0.5f).Text(_pastorName).AlignCenter()
                    .Italic();
 
             });
