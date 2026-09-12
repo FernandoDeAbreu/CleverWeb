@@ -64,20 +64,36 @@
             </dl>
         </div>
 
-        <div class="card-panel__footer d-flex justify-content-between gap-2">
+        <div class="card-panel__footer d-flex flex-wrap justify-content-between gap-2">
             <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
-            @if (Model.CaixaID > 0)
-            {
-                <button type="button" class="btn btn-outline-secondary" disabled title="Não é possível estornar lançamentos de caixas fechados">
-                    <i class="bi bi-lock-fill me-1"></i> Estorno bloqueado
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-action="ImprimirComprovante"
+                   asp-route-id="@Model.Id"
+                   target="_blank"
+                   rel="noopener"
+                   class="btn btn-outline-danger"
+                   title="Abrir comprovante para reimpressão">
+                    <i class="bi bi-printer me-1"></i> Reimprimir
+                </a>
+                <button type="button"
+                        class="btn btn-outline-primary"
+                        onclick="compartilharComprovante(@Model.Id)"
+                        title="Compartilhar comprovante">
+                    <i class="bi bi-share me-1"></i> Compartilhar
                 </button>
-            }
-            else
-            {
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#estornarContribuicaoModal">
-                    <i class="bi bi-arrow-counterclockwise me-1"></i> Estornar
-                </button>
-            }
+                @if (Model.CaixaID > 0)
+                {
+                    <button type="button" class="btn btn-outline-secondary" disabled title="Não é possível estornar lançamentos de caixas fechados">
+                        <i class="bi bi-lock-fill me-1"></i> Estorno bloqueado
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#estornarContribuicaoModal">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Estornar
+                    </button>
+                }
+            </div>
         </div>
     </section>
 </div>
@@ -120,4 +136,40 @@
         </div>
     </div>
 </div>
+}
+
+@section Scripts {
+    <script>
+        async function compartilharComprovante(id) {
+            if (!navigator.share || !navigator.canShare) {
+                alert('Compartilhamento não suportado neste navegador.');
+                return;
+            }
+
+            try {
+                const response = await fetch('@Url.Action("ImprimirComprovante", "Contribuicao")?id=' + encodeURIComponent(id));
+                if (!response.ok) {
+                    throw new Error('Não foi possível gerar o comprovante.');
+                }
+
+                const blob = await response.blob();
+                const file = new File([blob], `Recibo-${id}.pdf`, { type: 'application/pdf' });
+
+                if (!navigator.canShare({ files: [file] })) {
+                    alert('Este dispositivo não suporta compartilhamento de arquivos.');
+                    return;
+                }
+
+                await navigator.share({
+                    title: 'Comprovante de contribuição',
+                    text: 'Segue o comprovante de contribuição.',
+                    files: [file]
+                });
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    alert('Não foi possível compartilhar o comprovante.');
+                }
+            }
+        }
+    </script>
 }
